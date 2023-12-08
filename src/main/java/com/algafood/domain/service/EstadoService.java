@@ -7,28 +7,28 @@ import org.springframework.stereotype.Service;
 
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.EntidadeNaoRemoverException;
-import com.algafood.domain.model.Cozinha;
-import com.algafood.domain.repository.CozinhaRepository;
+import com.algafood.domain.model.Estado;
+import com.algafood.domain.repository.EstadoRepository;
 
 @Service
-public class CozinhaService {
+public class EstadoService {
     
     @Autowired
-    private CozinhaRepository repository;
+    private EstadoRepository repository;
 
-    public Cozinha salvar(Cozinha cozinha) {
-        return repository.salvar(cozinha);
+    public Estado salvar(Estado estado) {
+        return repository.salvar(estado);
     }
 
-    public void excluir(Long cozinhaId) {
+    public void excluir(Long estadoId) {
         try {
-            repository.remover(cozinhaId);
+            repository.remover(estadoId);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntidadeNaoEncontradaException(String.format(
-                "Registro de ID %d não encontrado", cozinhaId));
+                "Registro de ID %d não encontrado", estadoId));
         } catch (DataIntegrityViolationException ex) {
             throw new EntidadeNaoRemoverException(String.format(
-                "O registro de ID %d está associado a outra entidade e não pode ser removido.", cozinhaId));
+                "O registro de ID %d está associado a outra entidade e não pode ser removido.", estadoId));
         }
     }
 }

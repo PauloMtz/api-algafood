@@ -16,70 +16,62 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
-import com.algafood.domain.model.Restaurante;
-import com.algafood.domain.repository.RestauranteRepository;
-import com.algafood.domain.service.RestauranteService;
+import com.algafood.domain.model.Cidade;
+import com.algafood.domain.repository.CidadeRepository;
+import com.algafood.domain.service.CidadeService;
 
 @RestController
-@RequestMapping("/restaurantes")
-public class RestauranteController {
+@RequestMapping("/cidades")
+public class CidadeController {
     
     @Autowired
-    private RestauranteRepository repository;
+    private CidadeRepository repository;
 
     @Autowired
-    private RestauranteService service;
+    private CidadeService service;
 
     @GetMapping
-    public List<Restaurante> listar() {
+    public List<Cidade> listar() {
         return repository.listar();
     }
 
-    /*@PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Restaurante adicionar(@RequestBody Restaurante restaurante) {
-        return service.salvar(restaurante);
-    }
-
-    {
-        "nome": "Comida Teste",
-        "taxaFrete": 12,
-        "cozinha": {
+    /*{
+        "nome": "Teste"
+        "estado": {
             "id": 1
         }
     }*/
 
     @PostMapping
-    public ResponseEntity<?> adicionar(@RequestBody Restaurante restaurante) {
+    public ResponseEntity<?> adicionar(@RequestBody Cidade cidade) {
         try {
-            restaurante = service.salvar(restaurante);
-            return ResponseEntity.status(HttpStatus.CREATED).body(restaurante);
+            cidade = service.salvar(cidade);
+            return ResponseEntity.status(HttpStatus.CREATED).body(cidade);
         } catch (EntidadeNaoEncontradaException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @GetMapping("/{restauranteId}")
-    public ResponseEntity<Restaurante> buscarPorId(@PathVariable("restauranteId") Long id) {
-        Restaurante restaurante = repository.buscar(id);
+    @GetMapping("/{cidadeId}")
+    public ResponseEntity<Cidade> buscarPorId(@PathVariable("cidadeId") Long id) {
+        Cidade cidade = repository.buscar(id);
 
-        if (restaurante != null) {
-			return ResponseEntity.ok(restaurante);
+        if (cidade != null) {
+			return ResponseEntity.ok(cidade);
 		}
 
-		//return ResponseEntity.notFound().build();
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/{restauranteId}")
-    public ResponseEntity<?> atualizar(@PathVariable Long restauranteId, 
-        @RequestBody Restaurante restaurante) {
+    @PutMapping("/{cidadeId}")
+    public ResponseEntity<?> atualizar(@PathVariable Long cidadeId, 
+        @RequestBody Cidade cidade) {
 
         try {
-			Restaurante persistido = repository.buscar(restauranteId);
+			Cidade persistido = repository.buscar(cidadeId);
 			
 			if (persistido != null) {
-				BeanUtils.copyProperties(restaurante, persistido, "id");
+				BeanUtils.copyProperties(cidade, persistido, "id");
 				
 				persistido = service.salvar(persistido);
 				return ResponseEntity.ok(persistido);
@@ -92,13 +84,15 @@ public class RestauranteController {
 		}
     }
 
-    @DeleteMapping("/{restauranteId}")
-	public ResponseEntity<?> remover(@PathVariable Long restauranteId) {
+    @DeleteMapping("/{cidadeId}")
+	public ResponseEntity<?> remover(@PathVariable Long cidadeId) {
 		try {
-			service.excluir(restauranteId);	
+			service.excluir(cidadeId);	
 			return ResponseEntity.noContent().build();
+			
 		} catch (EntidadeNaoEncontradaException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			
 		}
 	}
 }
