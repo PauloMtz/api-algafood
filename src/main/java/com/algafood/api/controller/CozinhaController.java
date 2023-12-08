@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.repository.CozinhaRepository;
+import com.algafood.domain.service.CozinhaService;
 
 @RestController
 @RequestMapping("/cozinhas")
@@ -25,6 +28,9 @@ public class CozinhaController {
     
     @Autowired
 	private CozinhaRepository cozinhaRepository;
+
+	@Autowired
+	private CozinhaService service;
 
 	/*
 		---------------------------------------
@@ -53,12 +59,32 @@ public class CozinhaController {
 		Cozinha cozinha = cozinhaRepository.buscar(id);
 		//return ResponseEntity.status(HttpStatus.OK).body(cozinha);
 		return ResponseEntity.ok(cozinha); // é a mesma coisa que a linha acima (shortcut)
+	}
+	
+	@DeleteMapping("/{cozinhaId}")
+	public ResponseEntity<Cozinha> remover(@PathVariable Long cozinhaId) {
+
+		Cozinha persistida = cozinhaRepository.buscar(cozinhaId);
+
+		try {
+			if (persistida != null) {
+				coservicezinhaRepository.remover(persistida);
+
+				//return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+				return ResponseEntity.noContent().build();
+			}
+			
+			//return ResponseEntity.notFound().build();
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		} catch (Exception ex) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+		}
 	}*/
 
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Cozinha adicionar(@RequestBody Cozinha cozinha) {
-		return cozinhaRepository.salvar(cozinha);
+		return service.salvar(cozinha);
 	}
 
 	@GetMapping("/{cozinhaId}")
@@ -91,7 +117,7 @@ public class CozinhaController {
 			// copia os valores recebidos para o objeto persistido
 			//BeanUtils.copyProperties(cozinha, persistida, "id");
 
-			persistida = cozinhaRepository.salvar(persistida);
+			persistida = service.salvar(persistida);
 
 			return ResponseEntity.ok(persistida);
 		}
@@ -103,19 +129,12 @@ public class CozinhaController {
 	@DeleteMapping("/{cozinhaId}")
 	public ResponseEntity<Cozinha> remover(@PathVariable Long cozinhaId) {
 
-		Cozinha persistida = cozinhaRepository.buscar(cozinhaId);
-
 		try {
-			if (persistida != null) {
-				cozinhaRepository.remover(persistida);
-
-				//return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-				return ResponseEntity.noContent().build();
-			}
-			
-			//return ResponseEntity.notFound().build();
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-		} catch (Exception ex) {
+			service.excluir(cozinhaId);
+			return ResponseEntity.noContent().build();
+		} catch (EntidadeNaoEncontradaException ex) {
+			return ResponseEntity.notFound().build();
+		} catch (EntidadeNaoRemoverException ex) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		}
 	}
