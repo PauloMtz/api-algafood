@@ -34,13 +34,6 @@ public class CidadeRepositoryImpl implements CidadeRepository {
 	public Cidade salvar(Cidade cidade) {
 		return manager.merge(cidade);
 	}
-	
-	/*@Transactional
-	@Override
-	public void remover(Cidade cidade) {
-		cidade = buscar(cidade.getId());
-		manager.remove(cidade);
-	}*/
 
 	@Transactional
 	@Override

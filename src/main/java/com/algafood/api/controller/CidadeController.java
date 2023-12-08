@@ -35,13 +35,6 @@ public class CidadeController {
         return repository.listar();
     }
 
-    /*{
-        "nome": "Teste"
-        "estado": {
-            "id": 1
-        }
-    }*/
-
     @PostMapping
     public ResponseEntity<?> adicionar(@RequestBody Cidade cidade) {
         try {

@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algafood.api.model.EstadosXmlWrapper;
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Estado;
@@ -32,26 +30,10 @@ public class EstadoController {
 
 	@Autowired
 	private EstadoService estadoService;
-
-	/*
-	    ---------------------------------------
-					Métodos Http
-		---------------------------------------
-		. inserir: 		POST 	/cozinhas
-		. buscar por Id: GET 	/cozinhas/{id}
-		. listar todos: GET 	/cozinhas
-		. editar: 		PUT 	/cozinhas/{id}
-		. excluir: 		DELETE 	/cozinhas/{id}
-		---------------------------------------
-	*/
 	
+	@GetMapping
 	public List<Estado> listar() {
 		return estadoRepository.listar();
-	}
-
-	@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
-	public EstadosXmlWrapper listaXml() {
-		return new EstadosXmlWrapper(estadoRepository.listar());
 	}
 
 	@PostMapping
@@ -82,10 +64,6 @@ public class EstadoController {
 		Estado persistido = estadoRepository.buscar(estadoId);
 
 		if (persistido != null) {
-			//persistida.setNome(cozinha.getNome());
-
-			// essa linha abaixo faz a mesma coisa acima, ou seja,
-			// copia os valores recebidos para o objeto persistido
 			BeanUtils.copyProperties(estado, persistido, "id");
 
 			persistido = estadoService.salvar(persistido);
