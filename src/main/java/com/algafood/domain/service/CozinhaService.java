@@ -17,12 +17,12 @@ public class CozinhaService {
     private CozinhaRepository repository;
 
     public Cozinha salvar(Cozinha cozinha) {
-        return repository.salvar(cozinha);
+        return repository.save(cozinha);
     }
 
     public void excluir(Long cozinhaId) {
         try {
-            repository.remover(cozinhaId);
+            repository.deleteById(cozinhaId);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntidadeNaoEncontradaException(String.format(
                 "Registro de ID %d não encontrado", cozinhaId));

@@ -1,6 +1,7 @@
 package com.algafood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class RestauranteController {
 
     @GetMapping
     public List<Restaurante> listar() {
-        return repository.listar();
+        return repository.findAll();
     }
 
     @PostMapping
@@ -47,10 +48,10 @@ public class RestauranteController {
 
     @GetMapping("/{restauranteId}")
     public ResponseEntity<Restaurante> buscarPorId(@PathVariable("restauranteId") Long id) {
-        Restaurante restaurante = repository.buscar(id);
+        Optional<Restaurante> restaurante = repository.findById(id);
 
-        if (restaurante != null) {
-			return ResponseEntity.ok(restaurante);
+        if (restaurante.isPresent()) {
+			return ResponseEntity.ok(restaurante.get());
 		}
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -61,13 +62,13 @@ public class RestauranteController {
         @RequestBody Restaurante restaurante) {
 
         try {
-			Restaurante persistido = repository.buscar(restauranteId);
+			Optional<Restaurante> persistido = repository.findById(restauranteId);
 			
 			if (persistido != null) {
-				BeanUtils.copyProperties(restaurante, persistido, "id");
+				BeanUtils.copyProperties(restaurante, persistido.get(), "id");
 				
-				persistido = service.salvar(persistido);
-				return ResponseEntity.ok(persistido);
+				Restaurante restauranteSalvar = service.salvar(persistido.get());
+				return ResponseEntity.ok(restauranteSalvar);
 			}
 			
 			return ResponseEntity.notFound().build();
