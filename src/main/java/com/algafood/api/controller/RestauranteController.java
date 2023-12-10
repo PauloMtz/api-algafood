@@ -1,5 +1,6 @@
 package com.algafood.api.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +56,12 @@ public class RestauranteController {
 		}
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping("/taxa-frete")
+    public List<Restaurante> porTaxaFrete(BigDecimal taxaIni, BigDecimal taxaFim) {
+        // url: http://localhost:8080/restaurantes/taxa-frete?taxaIni=10&taxaFim=13
+        return repository.findByTaxaFreteBetween(taxaIni, taxaFim);
     }
 
     @PutMapping("/{restauranteId}")

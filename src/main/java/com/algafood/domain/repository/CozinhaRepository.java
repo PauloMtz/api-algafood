@@ -14,4 +14,6 @@ public interface CozinhaRepository extends JpaRepository<Cozinha, Long> {
 
 	@Query("FROM Cozinha f WHERE UPPER(f.nome) LIKE CONCAT('%', UPPER(:nome), '%')")
 	List<Cozinha> listaPorNome(@Param("nome") String nome);
+
+	List<Cozinha> findByNomeContaining(String nome);
 }

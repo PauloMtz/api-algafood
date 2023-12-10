@@ -53,7 +53,7 @@ public class CozinhaController {
 
 	@GetMapping("/nome")
 	public List<Cozinha> cozinhasPorNome(@RequestParam("c") String nome) {
-		return cozinhaRepository.listaPorNome(nome); // url: http://localhost:8080/cozinhas/nome?c=ind
+		return cozinhaRepository.findByNomeContaining(nome); // url: http://localhost:8080/cozinhas/nome?c=ind
 	}
 	
 	@GetMapping
