@@ -72,7 +72,8 @@ public class RestauranteController {
 			Optional<Restaurante> persistido = repository.findById(restauranteId);
 			
 			if (persistido != null) {
-				BeanUtils.copyProperties(restaurante, persistido.get(), "id");
+				BeanUtils.copyProperties(restaurante, persistido.get(),
+                     "id", "formasPagamento", "endereco", "dataCadastro");
 				
 				Restaurante restauranteSalvar = service.salvar(persistido.get());
 				return ResponseEntity.ok(restauranteSalvar);
