@@ -21,7 +21,4 @@ public class Estado {
 	
 	@Column(nullable = false)
 	private String nome;
-
-	@Column(nullable = false)
-	private String sigla;
 }
