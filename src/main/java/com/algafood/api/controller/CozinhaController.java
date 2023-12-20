@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algafood.domain.exception.EntidadeNaoEncontradaException;
-import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.repository.CozinhaRepository;
 import com.algafood.domain.service.CozinhaService;
@@ -78,7 +76,7 @@ public class CozinhaController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 	}
 
-	@DeleteMapping("/{cozinhaId}")
+	/*@DeleteMapping("/{cozinhaId}")
 	public ResponseEntity<?> remover(@PathVariable Long cozinhaId) {
 
 		try {
@@ -89,5 +87,11 @@ public class CozinhaController {
 		} catch (EntidadeNaoRemoverException ex) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
 		}
+	}*/
+
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@DeleteMapping("/{cozinhaId}")
+	public void remover(@PathVariable Long cozinhaId) {
+		service.excluir(cozinhaId);
 	}
 }
