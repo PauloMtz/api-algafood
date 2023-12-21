@@ -3,10 +3,12 @@ package com.algafood.domain.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Cidade;
 import com.algafood.domain.model.Estado;
 import com.algafood.domain.repository.CidadeRepository;
@@ -41,11 +43,14 @@ public class CidadeService {
     }
 
     public void excluir(Long cidadeId) {
-		try {
-			cidadeRepository.deleteById(cidadeId);
-		} catch (EmptyResultDataAccessException e) {
-			throw new EntidadeNaoEncontradaException(
-				String.format("Registro de ID %d não encontrado", cidadeId));
-		}
+        try {
+            cidadeRepository.deleteById(cidadeId);
+        } catch (EmptyResultDataAccessException ex) {
+            throw new EntidadeNaoEncontradaException(String.format(
+                "Registro de ID %d não encontrado", cidadeId));
+        } catch (DataIntegrityViolationException ex) {
+            throw new EntidadeNaoRemoverException(String.format(
+                "O registro de ID %d está associado a outra entidade e não pode ser removido.", cidadeId));
+        }
 	}
 }

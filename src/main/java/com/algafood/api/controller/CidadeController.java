@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
@@ -78,15 +79,9 @@ public class CidadeController {
 		}
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{cidadeId}")
-	public ResponseEntity<?> remover(@PathVariable Long cidadeId) {
-		try {
-			service.excluir(cidadeId);	
-			return ResponseEntity.noContent().build();
-			
-		} catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-			
-		}
+	public void remover(@PathVariable Long cidadeId) {
+        service.excluir(cidadeId);
 	}
 }

@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
-import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Estado;
 import com.algafood.domain.repository.EstadoRepository;
 import com.algafood.domain.service.EstadoService;
@@ -75,16 +75,9 @@ public class EstadoController {
 		return ResponseEntity.notFound().build();
 	}
 
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@DeleteMapping("/{estadoId}")
-	public ResponseEntity<?> remover(@PathVariable Long estadoId) {
-
-		try {
-			estadoService.excluir(estadoId);
-			return ResponseEntity.noContent().build();
-		} catch (EntidadeNaoEncontradaException ex) {
-			return ResponseEntity.notFound().build();
-		} catch (EntidadeNaoRemoverException ex) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
-		}
+	public void remover(@PathVariable Long estadoId) {
+		estadoService.excluir(estadoId);
 	}
 }
