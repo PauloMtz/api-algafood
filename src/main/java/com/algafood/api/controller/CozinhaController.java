@@ -1,12 +1,10 @@
 package com.algafood.api.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +25,7 @@ import com.algafood.domain.service.CozinhaService;
 public class CozinhaController {
     
     @Autowired
-	private CozinhaRepository cozinhaRepository;
+	private CozinhaRepository repository;
 
 	@Autowired
 	private CozinhaService service;
@@ -39,41 +37,28 @@ public class CozinhaController {
 	}
 
 	@GetMapping("/{cozinhaId}")
-	public ResponseEntity<Cozinha> buscarPorId(@PathVariable("cozinhaId") Long id) {
-		Optional<Cozinha> cozinha = cozinhaRepository.findById(id);
-		
-		if (cozinha.isPresent()) {
-			return ResponseEntity.ok(cozinha.get());
-		}
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+	public Cozinha buscarPorId(@PathVariable("cozinhaId") Long id) {
+		return service.buscar(id);
 	}
 
 	@GetMapping("/nome")
 	public List<Cozinha> cozinhasPorNome(@RequestParam("c") String nome) {
-		return cozinhaRepository.findByNomeContaining(nome); // url: http://localhost:8080/cozinhas/nome?c=ind
+		return repository.findByNomeContaining(nome); // url: http://localhost:8080/cozinhas/nome?c=ind
 	}
 	
 	@GetMapping
 	public List<Cozinha> listar() {
-		return cozinhaRepository.findAll();
+		return repository.findAll();
 	}
 
 	@PutMapping("/{cozinhaId}")
-	public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId,
-		@RequestBody Cozinha cozinha) {
+	public Cozinha atualizar(@PathVariable Long cozinhaId, @RequestBody Cozinha cozinha) {
 
-		Optional<Cozinha> persistida = cozinhaRepository.findById(cozinhaId);
+		Cozinha persistida = service.buscar(cozinhaId);
+			
+		BeanUtils.copyProperties(cozinha, persistida, "id");
 
-		if (persistida.isPresent()) {
-			BeanUtils.copyProperties(cozinha, persistida.get(), "id");
-
-			Cozinha cozinhaSalvar = service.salvar(persistida.get());
-
-			return ResponseEntity.ok(cozinhaSalvar);
-		}
-
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		return service.salvar(persistida);
 	}
 
 	@ResponseStatus(HttpStatus.NO_CONTENT)

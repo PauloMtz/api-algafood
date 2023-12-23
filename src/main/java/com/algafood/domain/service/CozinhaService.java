@@ -12,6 +12,12 @@ import com.algafood.domain.repository.CozinhaRepository;
 
 @Service
 public class CozinhaService {
+
+    private static final String MSG_REGISTRO_UTILIZADO = 
+        "O registro de ID %d está associado a outra entidade e não pode ser removido.";
+
+	private static final String MSG_RECURSO_NAO_ENCONTRADO = 
+        "Registro de ID %d não encontrado";
     
     @Autowired
     private CozinhaRepository repository;
@@ -25,10 +31,16 @@ public class CozinhaService {
             repository.deleteById(cozinhaId);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntidadeNaoEncontradaException(String.format(
-                "Registro de ID %d não encontrado", cozinhaId));
+                MSG_RECURSO_NAO_ENCONTRADO, cozinhaId));
         } catch (DataIntegrityViolationException ex) {
             throw new EntidadeNaoRemoverException(String.format(
-                "O registro de ID %d está associado a outra entidade e não pode ser removido.", cozinhaId));
+                MSG_REGISTRO_UTILIZADO, cozinhaId));
         }
     }
+
+    public Cozinha buscar(Long cozinhaId) {
+		return repository.findById(cozinhaId)
+			.orElseThrow(() -> new EntidadeNaoEncontradaException(
+                String.format(MSG_RECURSO_NAO_ENCONTRADO, cozinhaId)));
+	}
 }

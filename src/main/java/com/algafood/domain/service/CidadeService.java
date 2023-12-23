@@ -1,7 +1,5 @@
 package com.algafood.domain.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,45 +10,47 @@ import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Cidade;
 import com.algafood.domain.model.Estado;
 import com.algafood.domain.repository.CidadeRepository;
-import com.algafood.domain.repository.EstadoRepository;
 
 @Service
 public class CidadeService {
+
+    private static final String MSG_REGISTRO_UTILIZADO = 
+        "O registro de ID %d está associado a outra entidade e não pode ser removido.";
+
+	private static final String MSG_RECURSO_NAO_ENCONTRADO = 
+        "Registro de ID %d não encontrado";
     
     @Autowired
-    private CidadeRepository cidadeRepository;
+    private CidadeRepository repository;
 
     @Autowired
-    private EstadoRepository estadoRepository;
+    private EstadoService service;
 
     public Cidade salvar(Cidade cidade) {
-        // recebe um estado associado no corpo da requisição
         Long estadoId = cidade.getEstado().getId();
-        // busca o registro no banco
-        Optional<Estado> estado = estadoRepository.findById(estadoId);
+        
+        Estado estado = service.buscar(estadoId);
 
-        // se o registron for nulo, retorna mensagem de erro
-        if (estado.isEmpty()) {
-            throw new EntidadeNaoEncontradaException(String.format(
-                "Não existe estado com o ID %d", estadoId));
-        }
+        cidade.setEstado(estado);
 
-        // se encontrar o registro, define o registro associado
-        cidade.setEstado(estado.get());
-
-        // salva no banco
-        return cidadeRepository.save(cidade);
+        return repository.save(cidade);
     }
 
     public void excluir(Long cidadeId) {
         try {
-            cidadeRepository.deleteById(cidadeId);
+            repository.deleteById(cidadeId);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntidadeNaoEncontradaException(String.format(
-                "Registro de ID %d não encontrado", cidadeId));
+                MSG_RECURSO_NAO_ENCONTRADO, cidadeId));
         } catch (DataIntegrityViolationException ex) {
             throw new EntidadeNaoRemoverException(String.format(
-                "O registro de ID %d está associado a outra entidade e não pode ser removido.", cidadeId));
+                MSG_REGISTRO_UTILIZADO, cidadeId));
         }
+	}
+
+    public Cidade buscar(Long cidadeId) {
+		return repository.findById(cidadeId)
+			.orElseThrow(() -> new EntidadeNaoEncontradaException(
+                String.format(MSG_RECURSO_NAO_ENCONTRADO, cidadeId)));
 	}
 }

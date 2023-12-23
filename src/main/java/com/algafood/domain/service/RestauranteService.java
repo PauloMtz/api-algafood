@@ -9,30 +9,27 @@ import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.model.Restaurante;
-import com.algafood.domain.repository.CozinhaRepository;
 import com.algafood.domain.repository.RestauranteRepository;
 
 @Service
 public class RestauranteService {
+
+    private static final String MSG_REGISTRO_UTILIZADO = 
+        "O registro de ID %d está associado a outra entidade e não pode ser removido.";
+
+	private static final String MSG_RECURSO_NAO_ENCONTRADO = 
+        "Registro de ID %d não encontrado";
     
     @Autowired
     private RestauranteRepository restauranteRepository;
 
     @Autowired
-    private CozinhaRepository cozinhaRepository;
+    private CozinhaService cozinhaService;
 
     public Restaurante salvar(Restaurante restaurante) {
         Long cozinhaId = restaurante.getCozinha().getId();
-        /*Optional<Cozinha> cozinha = cozinhaRepository.findById(cozinhaId);
 
-        if (cozinha.isEmpty()) {
-            throw new EntidadeNaoEncontradaException(String.format(
-                "Não existe cozinha com o ID %d", cozinhaId));
-        }*/
-
-        Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
-            .orElseThrow(() -> new EntidadeNaoEncontradaException(String.format(
-                "Registro de ID %d não encontrado", cozinhaId)));
+        Cozinha cozinha = cozinhaService.buscar(cozinhaId);
 
         restaurante.setCozinha(cozinha);
 
@@ -44,10 +41,16 @@ public class RestauranteService {
             restauranteRepository.deleteById(restauranteId);
         } catch (EmptyResultDataAccessException ex) {
             throw new EntidadeNaoEncontradaException(String.format(
-                "Registro de ID %d não encontrado", restauranteId));
+                MSG_RECURSO_NAO_ENCONTRADO, restauranteId));
         } catch (DataIntegrityViolationException ex) {
             throw new EntidadeNaoRemoverException(String.format(
-                "O registro de ID %d está associado a outra entidade e não pode ser removido.", restauranteId));
+                MSG_REGISTRO_UTILIZADO, restauranteId));
         }
+	}
+
+    public Restaurante buscar(Long cidadeId) {
+		return restauranteRepository.findById(cidadeId)
+			.orElseThrow(() -> new EntidadeNaoEncontradaException(
+                String.format(MSG_RECURSO_NAO_ENCONTRADO, cidadeId)));
 	}
 }
