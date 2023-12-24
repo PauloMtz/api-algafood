@@ -5,7 +5,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algafood.domain.exception.CidadeNaoEncontradaException;
 import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Cidade;
 import com.algafood.domain.model.Estado;
@@ -16,9 +16,6 @@ public class CidadeService {
 
     private static final String MSG_REGISTRO_UTILIZADO = 
         "O registro de ID %d está associado a outra entidade e não pode ser removido.";
-
-	private static final String MSG_RECURSO_NAO_ENCONTRADO = 
-        "Registro de ID %d não encontrado";
     
     @Autowired
     private CidadeRepository repository;
@@ -40,8 +37,7 @@ public class CidadeService {
         try {
             repository.deleteById(cidadeId);
         } catch (EmptyResultDataAccessException ex) {
-            throw new EntidadeNaoEncontradaException(String.format(
-                MSG_RECURSO_NAO_ENCONTRADO, cidadeId));
+            throw new CidadeNaoEncontradaException(cidadeId);
         } catch (DataIntegrityViolationException ex) {
             throw new EntidadeNaoRemoverException(String.format(
                 MSG_REGISTRO_UTILIZADO, cidadeId));
@@ -50,7 +46,6 @@ public class CidadeService {
 
     public Cidade buscar(Long cidadeId) {
 		return repository.findById(cidadeId)
-			.orElseThrow(() -> new EntidadeNaoEncontradaException(
-                String.format(MSG_RECURSO_NAO_ENCONTRADO, cidadeId)));
+			.orElseThrow(() -> new CidadeNaoEncontradaException(cidadeId));
 	}
 }
