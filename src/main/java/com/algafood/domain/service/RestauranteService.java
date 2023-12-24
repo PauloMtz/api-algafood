@@ -48,9 +48,9 @@ public class RestauranteService {
         }
 	}
 
-    public Restaurante buscar(Long cidadeId) {
-		return restauranteRepository.findById(cidadeId)
+    public Restaurante buscar(Long restauranteId) {
+		return restauranteRepository.findById(restauranteId)
 			.orElseThrow(() -> new EntidadeNaoEncontradaException(
-                String.format(MSG_RECURSO_NAO_ENCONTRADO, cidadeId)));
+                String.format(MSG_RECURSO_NAO_ENCONTRADO, restauranteId)));
 	}
 }

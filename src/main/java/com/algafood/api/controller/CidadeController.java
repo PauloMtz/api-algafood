@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.algafood.domain.exception.NegocioException;
 import com.algafood.domain.model.Cidade;
 import com.algafood.domain.repository.CidadeRepository;
@@ -42,7 +42,7 @@ public class CidadeController {
         // se não encontrar entidade associada (Estado), lança BAD_REQUEST
         try {
             return service.salvar(cidade);
-        } catch (EntidadeNaoEncontradaException e) {
+        } catch (EstadoNaoEncontradoException e) {
             throw new NegocioException(e.getMessage());
         }
     }
@@ -61,8 +61,8 @@ public class CidadeController {
         // se não encontrar entidade associada (Estado), lança BAD_REQUEST
 		try {	
 			return service.salvar(persistida);
-		} catch (EntidadeNaoEncontradaException e) {
-			throw new NegocioException(e.getMessage());
+		} catch (EstadoNaoEncontradoException e) {
+			throw new NegocioException(e.getMessage(), e);
 		}
     }
 
