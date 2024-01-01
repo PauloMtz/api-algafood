@@ -26,13 +26,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		CustomMessage customMessage = createCustomMessageBuiler(
 			status, typeMessage, detail).build();
 
-		/*CustomMessage mensagemCustomizada = CustomMessage.builder()
-				.status(status.value())
-				.type("http://localhost:8080/recurso-nao-encontrado")
-				.title("Recurso não encontrado")
-				.detail(ex.getMessage())
-				.build();*/
-
 		return handleExceptionInternal(ex, customMessage, new HttpHeaders(),
 			status, request);
 	}
@@ -41,16 +34,30 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	public ResponseEntity<?> handleEntidadeNaoRemoverException(
 			EntidadeNaoRemoverException ex, WebRequest request) {
 
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
-			HttpStatus.CONFLICT, request);
+		HttpStatus status = HttpStatus.CONFLICT;
+		TypeMessage typeMessage = TypeMessage.RECURSO_NAO_PODE_SER_REMOVIDO;
+		String detail = ex.getMessage();
+
+		CustomMessage customMessage = createCustomMessageBuiler(
+			status, typeMessage, detail).build();
+
+		return handleExceptionInternal(ex, customMessage, new HttpHeaders(), 
+			status, request);
 	}
 	
 	@ExceptionHandler(NegocioException.class)
 	public ResponseEntity<?> handleNegocioException(NegocioException ex, 
 		WebRequest request) {
+
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		TypeMessage typeMessage = TypeMessage.RECURSO_INVALIDO;
+		String detail = ex.getMessage();
+
+		CustomMessage customMessage = createCustomMessageBuiler(
+			status, typeMessage, detail).build();
 			
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
-			HttpStatus.BAD_REQUEST, request);
+		return handleExceptionInternal(ex, customMessage, new HttpHeaders(), 
+			status, request);
 	}
 
 	@Override

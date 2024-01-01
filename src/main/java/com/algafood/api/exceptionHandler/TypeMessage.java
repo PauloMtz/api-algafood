@@ -5,7 +5,12 @@ import lombok.Getter;
 @Getter
 public enum TypeMessage {
     
-    RECURSO_NAO_ENCONTRADO("/recurso-nao-encontrado-exception", "Recurso não encontrado");
+    RECURSO_NAO_ENCONTRADO("/recurso-nao-encontrado-exception", 
+        "Recurso não encontrado"),
+    RECURSO_NAO_PODE_SER_REMOVIDO("/nao-pode-ser-removido", 
+        "Recurso não pode ser removido"),
+    RECURSO_INVALIDO("/recurso-invalido", 
+        "Recurso e/ou informação inválidos");
 
     private String title;
     private String uri;
