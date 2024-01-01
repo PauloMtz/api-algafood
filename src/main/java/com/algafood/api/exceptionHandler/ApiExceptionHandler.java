@@ -1,7 +1,5 @@
 package com.algafood.api.exceptionHandler;
 
-import java.time.LocalDateTime;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,15 +16,29 @@ import com.algafood.domain.exception.NegocioException;
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     
     @ExceptionHandler(EntidadeNaoEncontradaException.class)
-	public ResponseEntity<?> tratarEntidadeNaoEncontradaException(
+	public ResponseEntity<?> handleEntidadeNaoEncontradaException(
 			EntidadeNaoEncontradaException ex, WebRequest request) {
-				
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
-			HttpStatus.NOT_FOUND, request);
+		
+		HttpStatus status = HttpStatus.NOT_FOUND;
+		TypeMessage typeMessage = TypeMessage.RECURSO_NAO_ENCONTRADO;
+		String detail = ex.getMessage();
+
+		CustomMessage customMessage = createCustomMessageBuiler(
+			status, typeMessage, detail).build();
+
+		/*CustomMessage mensagemCustomizada = CustomMessage.builder()
+				.status(status.value())
+				.type("http://localhost:8080/recurso-nao-encontrado")
+				.title("Recurso não encontrado")
+				.detail(ex.getMessage())
+				.build();*/
+
+		return handleExceptionInternal(ex, customMessage, new HttpHeaders(),
+			status, request);
 	}
 
 	@ExceptionHandler(EntidadeNaoRemoverException.class)
-	public ResponseEntity<?> tratarEntidadeNaoRemoverException(
+	public ResponseEntity<?> handleEntidadeNaoRemoverException(
 			EntidadeNaoRemoverException ex, WebRequest request) {
 
 		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
@@ -34,7 +46,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(NegocioException.class)
-	public ResponseEntity<?> tratarNegocioException(NegocioException ex, 
+	public ResponseEntity<?> handleNegocioException(NegocioException ex, 
 		WebRequest request) {
 			
 		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
@@ -46,17 +58,27 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			org.springframework.http.HttpHeaders headers, HttpStatus status, WebRequest request) {
 		
 		if (body == null) {
-			body = MensagemCustomizada.builder()
-				.dataHora(LocalDateTime.now())
-				.mensagem(status.getReasonPhrase())
+			body = CustomMessage.builder()
+				.title(status.getReasonPhrase())
+				.status(status.value())
 				.build();
 		} else if (body instanceof String) {
-			body = MensagemCustomizada.builder()
-				.dataHora(LocalDateTime.now())
-				.mensagem((String) body)
+			body = CustomMessage.builder()
+				.title((String) body)
+				.status(status.value())
 				.build();
 		}
 
 		return super.handleExceptionInternal(ex, body, headers, status, request);
+	}
+
+	private CustomMessage.CustomMessageBuilder createCustomMessageBuiler(
+		HttpStatus status, TypeMessage typeMessage, String detail) {
+
+		return CustomMessage.builder()
+			.status(status.value())
+			.type(typeMessage.getUri())
+			.title(typeMessage.getTitle())
+			.detail(detail);
 	}
 }
