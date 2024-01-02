@@ -1,5 +1,8 @@
 package com.algafood.api.exceptionHandler;
 
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.exception.NegocioException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -21,17 +25,45 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		HttpMessageNotReadableException ex, HttpHeaders headers, 
 		HttpStatus status, WebRequest request) {
 		
+		Throwable rootCause = ExceptionUtils.getRootCause(ex);
+
+		if (rootCause instanceof InvalidFormatException) {
+			return handleInvalidFormatException(
+				(InvalidFormatException) rootCause, headers, status, request);
+		}
+
 		TypeMessage typeMessage = TypeMessage.RECURSO_NAO_IDENTIFICADO;
 		String detail = "Corpo da requisição inválido. Verifique a sintaxe.";
 
 		CustomMessage customMessage = createCustomMessageBuiler(
 			status, typeMessage, detail).build();
 		
-		return handleExceptionInternal(ex, customMessage, new HttpHeaders(), 
+		return handleExceptionInternal(ex, customMessage, headers, 
 			status, request);
 	}
     
-    @ExceptionHandler(EntidadeNaoEncontradaException.class)
+    private ResponseEntity<Object> handleInvalidFormatException(
+		InvalidFormatException ex, HttpHeaders headers, HttpStatus status, 
+		WebRequest request) {
+		
+		String path = ex.getPath().stream()
+			.map(ref -> ref.getFieldName())
+			.collect(Collectors.joining("."));
+
+		TypeMessage typeMessage = TypeMessage.RECURSO_NAO_IDENTIFICADO;
+		String detail = String.format("A propriedade '%s' recebeu o valor "
+			+ "'%s' que é um tipo inválido. Informe um valor compatível "
+			+ "com o tipo %s.", path, ex.getValue(), 
+			ex.getTargetType().getSimpleName());
+		
+		CustomMessage customMessage = createCustomMessageBuiler(
+			status, typeMessage, detail).build();
+
+		return handleExceptionInternal(ex, customMessage, headers, 
+			status, request);
+	}
+
+	@ExceptionHandler(EntidadeNaoEncontradaException.class)
 	public ResponseEntity<?> handleEntidadeNaoEncontradaException(
 			EntidadeNaoEncontradaException ex, WebRequest request) {
 		
