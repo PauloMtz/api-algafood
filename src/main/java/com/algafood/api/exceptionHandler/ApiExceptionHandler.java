@@ -20,6 +20,12 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
+	/*
+	 * aula 8.22 - lançando erro na desserialização de propriedades inexistentes
+	 * ao informar uma propriedade inexistente, cai nesse método
+	 * precisa habilitar a funcionalidade a seguir no application.properties
+	 * spring.jackson.deserialization.fail-on-unknown-properties=true
+	 */
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
 		HttpMessageNotReadableException ex, HttpHeaders headers, 
