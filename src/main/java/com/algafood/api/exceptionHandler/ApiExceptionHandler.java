@@ -22,7 +22,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	/*
 	 * aula 8.22 - lançando erro na desserialização de propriedades inexistentes
-	 * ao informar uma propriedade inexistente, cai nesse método
+	 * ao informar propriedades ignoradas (com @JsonIgnore, como o Endereco), cai aqui
 	 * precisa habilitar a funcionalidade a seguir no application.properties
 	 * spring.jackson.deserialization.fail-on-unknown-properties=true
 	 */
