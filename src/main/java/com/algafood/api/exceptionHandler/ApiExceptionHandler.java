@@ -1,5 +1,6 @@
 package com.algafood.api.exceptionHandler;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -15,17 +16,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.exception.NegocioException;
+import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-	/*
-	 * aula 8.22 - lançando erro na desserialização de propriedades inexistentes
-	 * ao informar propriedades ignoradas (com @JsonIgnore, como o Endereco), cai aqui
-	 * precisa habilitar a funcionalidade a seguir no application.properties
-	 * spring.jackson.deserialization.fail-on-unknown-properties=true
-	 */
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(
 		HttpMessageNotReadableException ex, HttpHeaders headers, 
@@ -36,6 +33,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		if (rootCause instanceof InvalidFormatException) {
 			return handleInvalidFormatException(
 				(InvalidFormatException) rootCause, headers, status, request);
+		} else if (rootCause instanceof PropertyBindingException) {
+			return handlePropertyBindingException((PropertyBindingException) rootCause, headers, status, request); 
 		}
 
 		TypeMessage typeMessage = TypeMessage.RECURSO_NAO_IDENTIFICADO;
@@ -47,8 +46,32 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, customMessage, headers, 
 			status, request);
 	}
+
+	private ResponseEntity<Object> handlePropertyBindingException(
+		PropertyBindingException ex, HttpHeaders headers, HttpStatus status,
+		WebRequest request) {
+	
+		String path = joinPath(ex.getPath());
+		
+		TypeMessage typeMessage = TypeMessage.MENSAGEM_INCOMPREENSIVEL;
+
+		String detail = String.format("A propriedade '%s' não existe. "
+			+ "Corrija ou remova essa propriedade e tente novamente.", path);
+
+		CustomMessage customMessage = createCustomMessageBuiler(
+			status, typeMessage, detail).build();
+		
+		return handleExceptionInternal(ex, customMessage, headers, status, 
+			request);
+	}
     
-    private ResponseEntity<Object> handleInvalidFormatException(
+    private String joinPath(List<Reference> references) {
+		return references.stream()
+			.map(ref -> ref.getFieldName())
+			.collect(Collectors.joining("."));
+	}
+
+	private ResponseEntity<Object> handleInvalidFormatException(
 		InvalidFormatException ex, HttpHeaders headers, HttpStatus status, 
 		WebRequest request) {
 		
