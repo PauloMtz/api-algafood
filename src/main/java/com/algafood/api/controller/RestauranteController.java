@@ -61,7 +61,12 @@ public class RestauranteController {
 
     @GetMapping("/{restauranteId}")
     public Restaurante buscarPorId(@PathVariable("restauranteId") Long id) {
-		return service.buscar(id);
+		// forçando um erro
+        if (true) {
+            throw new IllegalArgumentException(">>> Forçando erro.");
+        }
+
+        return service.buscar(id);
     }
 
     @GetMapping("/taxa-frete")
