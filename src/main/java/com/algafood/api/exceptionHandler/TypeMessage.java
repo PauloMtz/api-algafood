@@ -14,7 +14,9 @@ public enum TypeMessage {
     RECURSO_INVALIDO("/recurso-invalido", 
         "Recurso e/ou informação inválidos"),
     RECURSO_NAO_IDENTIFICADO("/nao-identificado", 
-        "Recurso não identificado");
+        "Recurso não identificado"),
+    PARAMETRO_INVALIDO("/invalido", 
+        "Parâmetro informado está inválido");
 
     private String title;
     private String uri;
