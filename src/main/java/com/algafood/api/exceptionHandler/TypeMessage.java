@@ -7,7 +7,7 @@ public enum TypeMessage {
     
     MENSAGEM_INCOMPREENSIVEL("/mensagem-incompreensivel", 
         "Mensagem incompreensível"),
-    RECURSO_NAO_ENCONTRADO("/recurso-nao-encontrado-exception", 
+    RECURSO_NAO_ENCONTRADO("/recurso-nao-encontrado", 
         "Recurso não encontrado"),
     RECURSO_NAO_PODE_SER_REMOVIDO("/nao-pode-ser-removido", 
         "Recurso não pode ser removido"),
