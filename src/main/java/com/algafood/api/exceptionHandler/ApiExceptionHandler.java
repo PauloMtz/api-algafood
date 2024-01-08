@@ -1,5 +1,6 @@
 package com.algafood.api.exceptionHandler;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +27,9 @@ import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
+	public static final String MSG_FINAL_USER_ERROR = "Ocorreu um erro interno "
+		+ "na aplicação. Contate o administrador do sistema";
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleUncaught(Exception ex, 
 		WebRequest request) {
@@ -35,12 +39,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = "Ocorreu um erro interno inesperado no sistema. "
 				+ "Tente novamente e se o problema persistir, entre em contato "
 				+ "com o administrador do sistema.";
-
-		// Importante colocar o printStackTrace (pelo menos por enquanto, que não estamos
-		// fazendo logging) para mostrar a stacktrace no console
-		// Se não fizer isso, você não vai ver a stacktrace de exceptions que seriam importantes
-		// para você durante, especialmente na fase de desenvolvimento
-		ex.printStackTrace();
 		
 		CustomMessage customMessage = createCustomMessageBuiler(status, 
 			typeMessage, detail).build();
@@ -49,23 +47,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			status, request);
 	}
 
-	// 1. MethodArgumentTypeMismatchException é um subtipo de TypeMismatchException
-
-	// 2. ResponseEntityExceptionHandler já trata TypeMismatchException de forma mais abrangente
-	
-	// 3. Então, especializamos o método handleTypeMismatch e verificamos se a exception
-	//    é uma instância de MethodArgumentTypeMismatchException
-	
-	// 4. Se for, chamamos um método especialista em tratar esse tipo de exception
-	
-	// 5. Poderíamos fazer tudo dentro de handleTypeMismatch, mas preferi separar em outro método
 	@Override
 	protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, 
 		HttpHeaders headers, HttpStatus status, WebRequest request) {
 		
 		if (ex instanceof MethodArgumentTypeMismatchException) {
 			return handleMethodArgumentTypeMismatch(
-					(MethodArgumentTypeMismatchException) ex, headers, status, request);
+				(MethodArgumentTypeMismatchException) ex, headers, status, 
+					request);
 		}
 	
 		return super.handleTypeMismatch(ex, headers, status, request);
@@ -82,7 +71,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 				ex.getName(), ex.getValue(), ex.getRequiredType().getSimpleName());
 
 		CustomMessage customMessage = createCustomMessageBuiler(status, 
-			typeMessage, detail).build();
+			typeMessage, detail)
+			.userMessage(MSG_FINAL_USER_ERROR)
+			.build();
 
 		return handleExceptionInternal(ex, customMessage, headers, status, request);
 	}
@@ -105,7 +96,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		String detail = "Corpo da requisição inválido. Verifique a sintaxe.";
 
 		CustomMessage customMessage = createCustomMessageBuiler(
-			status, typeMessage, detail).build();
+			status, typeMessage, detail)
+			.userMessage(MSG_FINAL_USER_ERROR)
+			.build();
 		
 		return handleExceptionInternal(ex, customMessage, headers, 
 			status, request);
@@ -123,7 +116,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			+ "Corrija ou remova essa propriedade e tente novamente.", path);
 
 		CustomMessage customMessage = createCustomMessageBuiler(
-			status, typeMessage, detail).build();
+			status, typeMessage, detail)
+			.userMessage(MSG_FINAL_USER_ERROR)
+			.build();
 		
 		return handleExceptionInternal(ex, customMessage, headers, status, 
 			request);
@@ -150,7 +145,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			ex.getTargetType().getSimpleName());
 		
 		CustomMessage customMessage = createCustomMessageBuiler(
-			status, typeMessage, detail).build();
+			status, typeMessage, detail)
+			.userMessage(MSG_FINAL_USER_ERROR)
+			.build();
 
 		return handleExceptionInternal(ex, customMessage, headers, 
 			status, request);
@@ -167,7 +164,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			ex.getRequestURL());
 		
 		CustomMessage customMessage = createCustomMessageBuiler(status, 
-			typeMessage, detail).build();
+			typeMessage, detail)
+			.userMessage(MSG_FINAL_USER_ERROR)
+			.build();
 		
 		return handleExceptionInternal(ex, customMessage, headers, 
 			status, request);
@@ -224,11 +223,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		if (body == null) {
 			body = CustomMessage.builder()
+				.timestamp(LocalDateTime.now())
 				.title(status.getReasonPhrase())
 				.status(status.value())
 				.build();
 		} else if (body instanceof String) {
 			body = CustomMessage.builder()
+				.timestamp(LocalDateTime.now())
 				.title((String) body)
 				.status(status.value())
 				.build();
@@ -241,6 +242,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		HttpStatus status, TypeMessage typeMessage, String detail) {
 
 		return CustomMessage.builder()
+			.timestamp(LocalDateTime.now())
 			.status(status.value())
 			.type(typeMessage.getUri())
 			.title(typeMessage.getTitle())
