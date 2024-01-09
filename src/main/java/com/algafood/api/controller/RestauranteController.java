@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
@@ -50,7 +51,7 @@ public class RestauranteController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Restaurante adicionar(@RequestBody Restaurante restaurante) {
+    public Restaurante adicionar(@RequestBody @Valid Restaurante restaurante) {
         // se não encontrar entidade associada (Cozinha), lança BAD_REQUEST
         try {
             return service.salvar(restaurante);

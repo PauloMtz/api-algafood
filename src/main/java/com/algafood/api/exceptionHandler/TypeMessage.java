@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum TypeMessage {
     
+    DADOS_INVALIDOS("/dados-invalidos", "Dados inválidos"),
     ERRO_DE_SISTEMA("/erro-de-sistema", "Erro de sistema"),
     MENSAGEM_INCOMPREENSIVEL("/mensagem-incompreensivel", 
         "Mensagem incompreensível"),
