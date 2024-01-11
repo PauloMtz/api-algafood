@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,10 +39,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		TypeMessage typeMessage = TypeMessage.DADOS_INVALIDOS;
 	    String detail = "Um ou mais campos estão inválidos. "
 			+ "Faça o preenchimento correto e tente novamente.";
+
+		BindingResult result = ex.getBindingResult();
+
+		List<CustomMessage.Field> fields = result.getFieldErrors().stream()
+			.map(field -> CustomMessage.Field.builder()
+				.name(field.getField())
+				.userMessage(field.getDefaultMessage())
+				.build())
+			.collect(Collectors.toList());
 	        
 	    CustomMessage customMessage = createCustomMessageBuiler(status, 
 			typeMessage, detail)
 			.userMessage(detail)
+			.fields(fields)
 			.build();
 	    
 	    return handleExceptionInternal(ex, customMessage, headers, status, 
