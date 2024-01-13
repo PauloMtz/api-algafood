@@ -2,6 +2,8 @@ package com.algafood.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -38,8 +40,8 @@ public class CidadeController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Cidade adicionar(@RequestBody Cidade cidade) {
-        // se não encontrar entidade associada (Estado), lança BAD_REQUEST
+    public Cidade adicionar(@RequestBody @Valid Cidade cidade) {
+        
         try {
             return service.salvar(cidade);
         } catch (EstadoNaoEncontradoException e) {
@@ -53,13 +55,13 @@ public class CidadeController {
     }
 
     @PutMapping("/{cidadeId}")
-    public Cidade atualizar(@PathVariable Long cidadeId, @RequestBody Cidade cidade) {
+    public Cidade atualizar(@PathVariable Long cidadeId, 
+        @RequestBody @Valid Cidade cidade) {
+
         Cidade persistida = service.buscar(cidadeId);
         BeanUtils.copyProperties(cidade, persistida, "id");
 
-        // se não encontrar entidade principal (Cidade), lança NOT_FOUND
-        // se não encontrar entidade associada (Estado), lança BAD_REQUEST
-		try {	
+        try {	
 			return service.salvar(persistida);
 		} catch (EstadoNaoEncontradoException e) {
 			throw new NegocioException(e.getMessage(), e);

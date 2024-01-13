@@ -51,8 +51,9 @@ public class RestauranteController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Restaurante adicionar(@RequestBody @Valid Restaurante restaurante) {
-        // se não encontrar entidade associada (Cozinha), lança BAD_REQUEST
+    public Restaurante adicionar(@RequestBody 
+        @Valid Restaurante restaurante) {
+
         try {
             return service.salvar(restaurante);
         } catch (EntidadeNaoEncontradaException e) {
@@ -72,15 +73,14 @@ public class RestauranteController {
     }
 
     @PutMapping("/{restauranteId}")
-    public Restaurante atualizar(@PathVariable Long restauranteId, @RequestBody Restaurante restaurante) {
+    public Restaurante atualizar(@PathVariable Long restauranteId, 
+        @RequestBody @Valid Restaurante restaurante) {
 
         Restaurante persistido = service.buscar(restauranteId);
 				
         BeanUtils.copyProperties(restaurante, persistido,
             "id", "formasPagamento", "endereco", "dataCadastro");
 
-        // se não encontrar entidade principal (Restaurante), lança NOT_FOUND
-        // se não encontrar entidade associada (Cozinha), lança BAD_REQUEST
         try {
             return service.salvar(persistido);
         } catch (EntidadeNaoEncontradaException e) {

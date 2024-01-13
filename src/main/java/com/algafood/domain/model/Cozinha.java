@@ -9,7 +9,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+import com.algafood.Groups;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -20,19 +23,16 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class Cozinha {
     
+	@NotNull(groups = Groups.CozinhaId.class)
     @EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotBlank
 	@Column(nullable = false)
 	private String nome;
 
-	/*
-	 * o @JsonIgnore previne o erro de serialização de objetos
-	 * cujas classes utilizam o relacionamento @OneToMany e vice-versa
-	 * ver aula 6.1 para ver o que ocorre quando alterna as classes
-	*/
 	@JsonIgnore
 	@OneToMany(mappedBy = "cozinha")
 	private List<Restaurante> restaurantes = new ArrayList<>();
