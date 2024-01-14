@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +35,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	public static final String MSG_FINAL_USER_ERROR = "Ocorreu um erro interno "
 		+ "na aplicação. Contate o administrador do sistema";
 
+	@Autowired
+	private MessageSource messageSource;
+
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -43,10 +49,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		BindingResult result = ex.getBindingResult();
 
 		List<CustomMessage.Field> fields = result.getFieldErrors().stream()
-			.map(field -> CustomMessage.Field.builder()
+			.map(field -> {
+				String message = messageSource.getMessage(field, 
+					LocaleContextHolder.getLocale());
+
+				return CustomMessage.Field.builder()
 				.name(field.getField())
-				.userMessage(field.getDefaultMessage())
-				.build())
+				.userMessage(message)
+				.build();
+			})
 			.collect(Collectors.toList());
 	        
 	    CustomMessage customMessage = createCustomMessageBuiler(status, 
