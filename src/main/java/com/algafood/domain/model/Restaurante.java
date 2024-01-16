@@ -19,7 +19,7 @@ import javax.persistence.OneToMany;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-//import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
@@ -27,7 +27,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.algafood.core.validation.Groups;
-import com.algafood.core.validation.TaxaFrete;
+import com.algafood.core.validation.Multiplo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
@@ -48,8 +48,8 @@ public class Restaurante {
 	private String nome;
 	
 	@NotNull
-	//@PositiveOrZero
-	@TaxaFrete
+	@PositiveOrZero
+	@Multiplo(numero = 5)
 	@Column(nullable = false)
 	private BigDecimal taxaFrete;
 
