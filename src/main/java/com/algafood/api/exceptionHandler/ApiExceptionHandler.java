@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -48,13 +49,19 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 		BindingResult result = ex.getBindingResult();
 
-		List<CustomMessage.Field> fields = result.getFieldErrors().stream()
-			.map(field -> {
-				String message = messageSource.getMessage(field, 
+		List<CustomMessage.Object> errorsObject = result.getAllErrors().stream()
+			.map(objectError -> {
+				String message = messageSource.getMessage(objectError, 
 					LocaleContextHolder.getLocale());
 
-				return CustomMessage.Field.builder()
-				.name(field.getField())
+				String name = objectError.getObjectName();
+
+				if (objectError instanceof FieldError) {
+					name = ((FieldError) objectError).getField();
+				}
+
+				return CustomMessage.Object.builder()
+				.name(name)
 				.userMessage(message)
 				.build();
 			})
@@ -63,7 +70,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	    CustomMessage customMessage = createCustomMessageBuiler(status, 
 			typeMessage, detail)
 			.userMessage(detail)
-			.fields(fields)
+			.objects(errorsObject)
 			.build();
 	    
 	    return handleExceptionInternal(ex, customMessage, headers, status, 
