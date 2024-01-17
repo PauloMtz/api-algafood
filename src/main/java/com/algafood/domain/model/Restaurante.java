@@ -28,11 +28,15 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.algafood.core.validation.Groups;
 import com.algafood.core.validation.Multiplo;
+import com.algafood.core.validation.ValorZeroIncluiDescricao;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+// se a propriedade taxaFrete = 0, a propriedade nome deve conter 'Frete Grátis'
+@ValorZeroIncluiDescricao(valorField = "taxaFrete", 
+	descricaoField = "nome", descricaoObrigatoria = "Frete Grátis")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
