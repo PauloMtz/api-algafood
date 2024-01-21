@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.algafood.domain.exception.EntidadeNaoEncontradaException;
+import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.service.CozinhaService;
 
@@ -50,4 +52,23 @@ public class TesteIntegracaoCadastroCozinha {
         // validação
 		assertThat(erroEsperado).isNotNull();
 	}
+
+    @Test
+    public void testeExcluirCozinhaEmUso() {
+        EntidadeNaoRemoverException erroEsperado =
+            Assertions.assertThrows(
+                EntidadeNaoRemoverException.class, () -> {
+                    service.excluir(1L);
+            });
+
+        assertThat(erroEsperado).isNotNull();
+    }
+
+    @Test
+    public void testeExcluirCozinhaInexistente() {
+        Assertions.assertThrows(
+            EntidadeNaoEncontradaException.class, () -> {
+                service.excluir(100L);
+		});
+    }
 }
