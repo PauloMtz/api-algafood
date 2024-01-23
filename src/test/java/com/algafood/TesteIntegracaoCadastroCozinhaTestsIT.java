@@ -15,13 +15,13 @@ import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.service.CozinhaService;
 
 @SpringBootTest
-public class TesteIntegracaoCadastroCozinha {
+class TesteIntegracaoCadastroCozinhaTestsIT {
 
     @Autowired
     private CozinhaService service;
     
     @Test
-    public void testeCadastroCozinhaComSucesso() {
+    void testeCadastroCozinhaComSucesso() {
         // 1. cenário - caminho feliz (não dar erro)
         Cozinha novaCozinha = new Cozinha();
         novaCozinha.setNome("Chinesa");
@@ -35,7 +35,7 @@ public class TesteIntegracaoCadastroCozinha {
     }
 
     @Test
-	public void testeCadastroCozinhaSemNome() {
+	void testeCadastroCozinhaSemNome() {
         // 1. cenário - caminho infeliz (dar erro)
 		Cozinha novaCozinha = new Cozinha();
 
@@ -54,7 +54,7 @@ public class TesteIntegracaoCadastroCozinha {
 	}
 
     @Test
-    public void testeExcluirCozinhaEmUso() {
+    void testeExcluirCozinhaEmUso() {
         EntidadeNaoRemoverException erroEsperado =
             Assertions.assertThrows(
                 EntidadeNaoRemoverException.class, () -> {
@@ -65,7 +65,7 @@ public class TesteIntegracaoCadastroCozinha {
     }
 
     @Test
-    public void testeExcluirCozinhaInexistente() {
+    void testeExcluirCozinhaInexistente() {
         Assertions.assertThrows(
             EntidadeNaoEncontradaException.class, () -> {
                 service.excluir(100L);
