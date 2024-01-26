@@ -1,5 +1,7 @@
 package com.algafood;
 
+import static org.hamcrest.Matchers.equalTo;
+
 //import org.flywaydb.core.Flyway;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -86,6 +88,33 @@ class TesteApiCadastroCozinhaTestsIT {
                 .post()
             .then()
                 .statusCode(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    void retornaStatusCorreto_QuandoConsultaCozinhaExistente() {
+
+        RestAssured
+            .given()
+                .pathParam("cozinhaId", 2)
+                .accept(ContentType.JSON)
+            .when()
+                .get("/{cozinhaId}")
+            .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("nome", equalTo("Americana"));
+    }
+
+    @Test
+    void retornaStatus404_QuandoConsultaCozinhaInexistente() {
+
+        RestAssured
+            .given()
+                .pathParam("cozinhaId", 20)
+                .accept(ContentType.JSON)
+            .when()
+                .get("/{cozinhaId}")
+            .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     private void prepararDados() {
