@@ -1,6 +1,6 @@
 package com.algafood.api.exceptionHandler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,44 +84,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	    return handleExceptionInternal(ex, customMessage, headers, status,
 			request);
 	}
-
-	/*@Override
-	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
-
-		TypeMessage typeMessage = TypeMessage.DADOS_INVALIDOS;
-	    String detail = "Um ou mais campos estão inválidos. "
-			+ "Faça o preenchimento correto e tente novamente.";
-
-		BindingResult result = ex.getBindingResult();
-
-		List<CustomMessage.Object> errorsObject = result.getAllErrors().stream()
-			.map(objectError -> {
-				String message = messageSource.getMessage(objectError, 
-					LocaleContextHolder.getLocale());
-
-				String name = objectError.getObjectName();
-
-				if (objectError instanceof FieldError) {
-					name = ((FieldError) objectError).getField();
-				}
-
-				return CustomMessage.Object.builder()
-				.name(name)
-				.userMessage(message)
-				.build();
-			})
-			.collect(Collectors.toList());
-	        
-	    CustomMessage customMessage = createCustomMessageBuiler(status, 
-			typeMessage, detail)
-			.userMessage(detail)
-			.objects(errorsObject)
-			.build();
-	    
-	    return handleExceptionInternal(ex, customMessage, headers, status, 
-			request);
-	}*/
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleUncaught(Exception ex, 
@@ -316,13 +278,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		if (body == null) {
 			body = CustomMessage.builder()
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.title(status.getReasonPhrase())
 				.status(status.value())
 				.build();
 		} else if (body instanceof String) {
 			body = CustomMessage.builder()
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.title((String) body)
 				.status(status.value())
 				.build();
@@ -335,7 +297,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		HttpStatus status, TypeMessage typeMessage, String detail) {
 
 		return CustomMessage.builder()
-			.timestamp(LocalDateTime.now())
+			.timestamp(OffsetDateTime.now())
 			.status(status.value())
 			.type(typeMessage.getUri())
 			.title(typeMessage.getTitle())
