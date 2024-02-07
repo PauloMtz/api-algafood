@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algafood.api.model.dto.CozinhaDto;
+import com.algafood.api.model.dto.RestauranteDto;
 import com.algafood.core.validation.ValidacaoException;
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.NegocioException;
@@ -51,44 +54,60 @@ public class RestauranteController {
     private SmartValidator validator;
 
     @GetMapping
-    public List<Restaurante> listar() {
-        return repository.findAll();
+    public List<RestauranteDto> listar() {
+        return convertToCollectionDto(repository.findAll());
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public Restaurante adicionar(@RequestBody 
+    public RestauranteDto adicionar(@RequestBody 
         @Valid Restaurante restaurante) {
 
         try {
-            return service.salvar(restaurante);
+            return convertToDto(service.salvar(restaurante));
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
     }
 
     @GetMapping("/{restauranteId}")
-    public Restaurante buscarPorId(@PathVariable("restauranteId") Long id) {
-        return service.buscar(id);
+    public RestauranteDto buscarPorId(@PathVariable("restauranteId") Long id) {
+        Restaurante restaurante = service.buscar(id);
+
+        /*CozinhaDto cozinhaDto = new CozinhaDto();
+        cozinhaDto.setId(restaurante.getCozinha().getId());
+        cozinhaDto.setNome(restaurante.getCozinha().getNome());
+
+        RestauranteDto restauranteDto = new RestauranteDto();
+        restauranteDto.setId(restaurante.getId());
+        restauranteDto.setNome(restaurante.getNome());
+        restauranteDto.setTaxaFrete(restaurante.getTaxaFrete());
+        restauranteDto.setCozinha(cozinhaDto);
+        return restauranteDto;*/
+
+        RestauranteDto restauranteDto = convertToDto(restaurante);
+        
+        // return convertToDto(restaurante);
+        return restauranteDto;
     }
 
     @GetMapping("/taxa-frete")
-    public List<Restaurante> porTaxaFrete(BigDecimal taxaIni, BigDecimal taxaFim) {
+    public List<RestauranteDto> porTaxaFrete(BigDecimal taxaIni, BigDecimal taxaFim) {
         // url: http://localhost:8080/restaurantes/taxa-frete?taxaIni=10&taxaFim=13
-        return repository.findByTaxaFreteBetween(taxaIni, taxaFim);
+        return convertToCollectionDto(repository.findByTaxaFreteBetween(taxaIni, taxaFim));
     }
 
     @PutMapping("/{restauranteId}")
-    public Restaurante atualizar(@PathVariable Long restauranteId, 
+    public RestauranteDto atualizar(@PathVariable Long restauranteId, 
         @RequestBody @Valid Restaurante restaurante) {
 
-        Restaurante persistido = service.buscar(restauranteId);
-				
-        BeanUtils.copyProperties(restaurante, persistido,
-            "id", "formasPagamento", "endereco", "dataCadastro");
-
         try {
-            return service.salvar(persistido);
+            Restaurante persistido = service.buscar(restauranteId);
+				
+            BeanUtils.copyProperties(restaurante, persistido,
+                "id", "formasPagamento", "endereco", "dataCadastro");
+
+            return convertToDto(service.salvar(persistido));
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
@@ -101,7 +120,7 @@ public class RestauranteController {
 	}
 
     @PatchMapping("/{restauranteId}")
-	public Restaurante atualizarParcial(@PathVariable Long restauranteId,
+	public RestauranteDto atualizarParcial(@PathVariable Long restauranteId,
 			@RequestBody Map<String, Object> campos, HttpServletRequest request) {
 		Restaurante restauranteAtual = service.buscar(restauranteId);
 		
@@ -147,4 +166,24 @@ public class RestauranteController {
 			throw new HttpMessageNotReadableException(e.getMessage(), rootCause, serverHttpRequest);
 		}
 	}
+
+    private RestauranteDto convertToDto(Restaurante restaurante) {
+        CozinhaDto cozinhaDto = new CozinhaDto();
+        cozinhaDto.setId(restaurante.getCozinha().getId());
+        cozinhaDto.setNome(restaurante.getCozinha().getNome());
+
+        RestauranteDto restauranteDto = new RestauranteDto();
+        restauranteDto.setId(restaurante.getId());
+        restauranteDto.setNome(restaurante.getNome());
+        restauranteDto.setTaxaFrete(restaurante.getTaxaFrete());
+        restauranteDto.setCozinha(cozinhaDto);
+        return restauranteDto;
+    }
+
+    private List<RestauranteDto> convertToCollectionDto(List<Restaurante> restaurantes) {
+
+        return restaurantes.stream()
+            .map(restaurante -> convertToDto(restaurante))
+            .collect(Collectors.toList());
+    }
 }
