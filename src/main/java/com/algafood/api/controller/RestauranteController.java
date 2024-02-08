@@ -31,9 +31,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algafood.api.model.dto.CozinhaDto;
 import com.algafood.api.model.dto.RestauranteDto;
+import com.algafood.api.model.inputDto.CozinhaIdInputDto;
+import com.algafood.api.model.inputDto.RestauranteInputDto;
 import com.algafood.core.validation.ValidacaoException;
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.NegocioException;
+import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.model.Restaurante;
 import com.algafood.domain.repository.RestauranteRepository;
 import com.algafood.domain.service.RestauranteService;
@@ -61,9 +64,12 @@ public class RestauranteController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public RestauranteDto adicionar(@RequestBody 
-        @Valid Restaurante restaurante) {
+        @Valid RestauranteInputDto restauranteInputDto) {
 
         try {
+            Restaurante restaurante = convertToDomainObject(restauranteInputDto);
+            
+            // a classe RestauranteService fica isolada das classes Dto
             return convertToDto(service.salvar(restaurante));
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
@@ -99,9 +105,11 @@ public class RestauranteController {
 
     @PutMapping("/{restauranteId}")
     public RestauranteDto atualizar(@PathVariable Long restauranteId, 
-        @RequestBody @Valid Restaurante restaurante) {
+        @RequestBody @Valid RestauranteInputDto restauranteInputDto) {
 
         try {
+            Restaurante restaurante = convertToDomainObject(restauranteInputDto);
+
             Restaurante persistido = service.buscar(restauranteId);
 				
             BeanUtils.copyProperties(restaurante, persistido,
@@ -122,13 +130,14 @@ public class RestauranteController {
     @PatchMapping("/{restauranteId}")
 	public RestauranteDto atualizarParcial(@PathVariable Long restauranteId,
 			@RequestBody Map<String, Object> campos, HttpServletRequest request) {
+        
 		Restaurante restauranteAtual = service.buscar(restauranteId);
 		
 		merge(campos, restauranteAtual, request);
 
         validate(restauranteAtual, "restaurante");
 		
-		return atualizar(restauranteId, restauranteAtual);
+		return atualizar(restauranteId, convertToInputObject(restauranteAtual));
 	}
 
     private void validate(Restaurante restaurante, String object) {
@@ -186,4 +195,32 @@ public class RestauranteController {
             .map(restaurante -> convertToDto(restaurante))
             .collect(Collectors.toList());
     }
+
+    private Restaurante convertToDomainObject(RestauranteInputDto restauranteInputDto) {
+        Restaurante restaurante = new Restaurante();
+        restaurante.setNome(restauranteInputDto.getNome());
+        restaurante.setTaxaFrete(restauranteInputDto.getTaxaFrete());
+
+        Cozinha cozinha = new Cozinha();
+        cozinha.setId(restauranteInputDto.getCozinha().getId());
+
+        restaurante.setCozinha(cozinha);
+
+        return restaurante;
+    }
+
+    // método sugerido no fórum da Algaworks para ser utilizado
+    // no método de atualizarParcial
+    private RestauranteInputDto convertToInputObject(Restaurante restaurante) {
+		RestauranteInputDto restauranteInputDto = new RestauranteInputDto();
+		restauranteInputDto.setNome(restaurante.getNome());
+		restauranteInputDto.setTaxaFrete(restaurante.getTaxaFrete());
+		
+		CozinhaIdInputDto cozinhaIdInputDto = new CozinhaIdInputDto();
+		cozinhaIdInputDto.setId(restaurante.getCozinha().getId());
+		
+		restauranteInputDto.setCozinha(cozinhaIdInputDto);
+		
+		return restauranteInputDto;		
+	}
 }
