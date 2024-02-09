@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -29,9 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algafood.api.model.dto.CozinhaDto;
+import com.algafood.api.assembler.RestauranteDtoAssembler;
 import com.algafood.api.model.dto.RestauranteDto;
-import com.algafood.api.model.inputDto.CozinhaIdInputDto;
 import com.algafood.api.model.inputDto.RestauranteInputDto;
 import com.algafood.core.validation.ValidacaoException;
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
@@ -56,9 +54,12 @@ public class RestauranteController {
     @Autowired
     private SmartValidator validator;
 
+    @Autowired
+    private RestauranteDtoAssembler assembler;
+
     @GetMapping
     public List<RestauranteDto> listar() {
-        return convertToCollectionDto(repository.findAll());
+        return assembler.convertToCollectionDto(repository.findAll());
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -70,7 +71,7 @@ public class RestauranteController {
             Restaurante restaurante = convertToDomainObject(restauranteInputDto);
             
             // a classe RestauranteService fica isolada das classes Dto
-            return convertToDto(service.salvar(restaurante));
+            return assembler.convertToDto(service.salvar(restaurante));
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
@@ -91,7 +92,7 @@ public class RestauranteController {
         restauranteDto.setCozinha(cozinhaDto);
         return restauranteDto;*/
 
-        RestauranteDto restauranteDto = convertToDto(restaurante);
+        RestauranteDto restauranteDto = assembler.convertToDto(restaurante);
         
         // return convertToDto(restaurante);
         return restauranteDto;
@@ -100,7 +101,7 @@ public class RestauranteController {
     @GetMapping("/taxa-frete")
     public List<RestauranteDto> porTaxaFrete(BigDecimal taxaIni, BigDecimal taxaFim) {
         // url: http://localhost:8080/restaurantes/taxa-frete?taxaIni=10&taxaFim=13
-        return convertToCollectionDto(repository.findByTaxaFreteBetween(taxaIni, taxaFim));
+        return assembler.convertToCollectionDto(repository.findByTaxaFreteBetween(taxaIni, taxaFim));
     }
 
     @PutMapping("/{restauranteId}")
@@ -115,7 +116,7 @@ public class RestauranteController {
             BeanUtils.copyProperties(restaurante, persistido,
                 "id", "formasPagamento", "endereco", "dataCadastro");
 
-            return convertToDto(service.salvar(persistido));
+            return assembler.convertToDto(service.salvar(persistido));
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage());
         }
@@ -137,7 +138,7 @@ public class RestauranteController {
 
         validate(restauranteAtual, "restaurante");
 		
-		return atualizar(restauranteId, convertToInputObject(restauranteAtual));
+		return atualizar(restauranteId, assembler.convertToInputObject(restauranteAtual));
 	}
 
     private void validate(Restaurante restaurante, String object) {
@@ -175,27 +176,7 @@ public class RestauranteController {
 			throw new HttpMessageNotReadableException(e.getMessage(), rootCause, serverHttpRequest);
 		}
 	}
-
-    private RestauranteDto convertToDto(Restaurante restaurante) {
-        CozinhaDto cozinhaDto = new CozinhaDto();
-        cozinhaDto.setId(restaurante.getCozinha().getId());
-        cozinhaDto.setNome(restaurante.getCozinha().getNome());
-
-        RestauranteDto restauranteDto = new RestauranteDto();
-        restauranteDto.setId(restaurante.getId());
-        restauranteDto.setNome(restaurante.getNome());
-        restauranteDto.setTaxaFrete(restaurante.getTaxaFrete());
-        restauranteDto.setCozinha(cozinhaDto);
-        return restauranteDto;
-    }
-
-    private List<RestauranteDto> convertToCollectionDto(List<Restaurante> restaurantes) {
-
-        return restaurantes.stream()
-            .map(restaurante -> convertToDto(restaurante))
-            .collect(Collectors.toList());
-    }
-
+    
     private Restaurante convertToDomainObject(RestauranteInputDto restauranteInputDto) {
         Restaurante restaurante = new Restaurante();
         restaurante.setNome(restauranteInputDto.getNome());
@@ -208,19 +189,4 @@ public class RestauranteController {
 
         return restaurante;
     }
-
-    // método sugerido no fórum da Algaworks para ser utilizado
-    // no método de atualizarParcial
-    private RestauranteInputDto convertToInputObject(Restaurante restaurante) {
-		RestauranteInputDto restauranteInputDto = new RestauranteInputDto();
-		restauranteInputDto.setNome(restaurante.getNome());
-		restauranteInputDto.setTaxaFrete(restaurante.getTaxaFrete());
-		
-		CozinhaIdInputDto cozinhaIdInputDto = new CozinhaIdInputDto();
-		cozinhaIdInputDto.setId(restaurante.getCozinha().getId());
-		
-		restauranteInputDto.setCozinha(cozinhaIdInputDto);
-		
-		return restauranteInputDto;		
-	}
 }
