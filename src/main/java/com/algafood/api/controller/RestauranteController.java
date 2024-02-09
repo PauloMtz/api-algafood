@@ -29,12 +29,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algafood.api.assembler.RestauranteDtoAssembler;
+import com.algafood.api.assembler.RestauranteInputDtoDisassembler;
 import com.algafood.api.model.dto.RestauranteDto;
 import com.algafood.api.model.inputDto.RestauranteInputDto;
 import com.algafood.core.validation.ValidacaoException;
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.NegocioException;
-import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.model.Restaurante;
 import com.algafood.domain.repository.RestauranteRepository;
 import com.algafood.domain.service.RestauranteService;
@@ -57,6 +57,9 @@ public class RestauranteController {
     @Autowired
     private RestauranteDtoAssembler assembler;
 
+    @Autowired
+    private RestauranteInputDtoDisassembler disassembler;
+
     @GetMapping
     public List<RestauranteDto> listar() {
         return assembler.convertToCollectionDto(repository.findAll());
@@ -68,7 +71,7 @@ public class RestauranteController {
         @Valid RestauranteInputDto restauranteInputDto) {
 
         try {
-            Restaurante restaurante = convertToDomainObject(restauranteInputDto);
+            Restaurante restaurante = disassembler.convertToDomainObject(restauranteInputDto);
             
             // a classe RestauranteService fica isolada das classes Dto
             return assembler.convertToDto(service.salvar(restaurante));
@@ -109,7 +112,7 @@ public class RestauranteController {
         @RequestBody @Valid RestauranteInputDto restauranteInputDto) {
 
         try {
-            Restaurante restaurante = convertToDomainObject(restauranteInputDto);
+            Restaurante restaurante = disassembler.convertToDomainObject(restauranteInputDto);
 
             Restaurante persistido = service.buscar(restauranteId);
 				
@@ -176,17 +179,4 @@ public class RestauranteController {
 			throw new HttpMessageNotReadableException(e.getMessage(), rootCause, serverHttpRequest);
 		}
 	}
-    
-    private Restaurante convertToDomainObject(RestauranteInputDto restauranteInputDto) {
-        Restaurante restaurante = new Restaurante();
-        restaurante.setNome(restauranteInputDto.getNome());
-        restaurante.setTaxaFrete(restauranteInputDto.getTaxaFrete());
-
-        Cozinha cozinha = new Cozinha();
-        cozinha.setId(restauranteInputDto.getCozinha().getId());
-
-        restaurante.setCozinha(cozinha);
-
-        return restaurante;
-    }
 }
