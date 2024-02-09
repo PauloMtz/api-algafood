@@ -3,9 +3,10 @@ package com.algafood.api.assembler;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.algafood.api.model.dto.CozinhaDto;
 import com.algafood.api.model.dto.RestauranteDto;
 import com.algafood.api.model.inputDto.CozinhaIdInputDto;
 import com.algafood.api.model.inputDto.RestauranteInputDto;
@@ -14,17 +15,12 @@ import com.algafood.domain.model.Restaurante;
 @Component
 public class RestauranteDtoAssembler {
 
-    public RestauranteDto convertToDto(Restaurante restaurante) {
-        CozinhaDto cozinhaDto = new CozinhaDto();
-        cozinhaDto.setId(restaurante.getCozinha().getId());
-        cozinhaDto.setNome(restaurante.getCozinha().getNome());
+    @Autowired
+    private ModelMapper modelMapper;
 
-        RestauranteDto restauranteDto = new RestauranteDto();
-        restauranteDto.setId(restaurante.getId());
-        restauranteDto.setNome(restaurante.getNome());
-        restauranteDto.setTaxaFrete(restaurante.getTaxaFrete());
-        restauranteDto.setCozinha(cozinhaDto);
-        return restauranteDto;
+    public RestauranteDto convertToDto(Restaurante restaurante) {
+        
+        return modelMapper.map(restaurante, RestauranteDto.class);
     }
 
     public List<RestauranteDto> convertToCollectionDto(List<Restaurante> restaurantes) {

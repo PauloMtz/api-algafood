@@ -1,24 +1,20 @@
 package com.algafood.api.assembler;
 
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.algafood.api.model.inputDto.RestauranteInputDto;
-import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.model.Restaurante;
 
 @Component
 public class RestauranteInputDtoDisassembler {
+
+    @Autowired
+    private ModelMapper modelMapper;
     
     public Restaurante convertToDomainObject(RestauranteInputDto restauranteInputDto) {
-        Restaurante restaurante = new Restaurante();
-        restaurante.setNome(restauranteInputDto.getNome());
-        restaurante.setTaxaFrete(restauranteInputDto.getTaxaFrete());
-
-        Cozinha cozinha = new Cozinha();
-        cozinha.setId(restauranteInputDto.getCozinha().getId());
-
-        restaurante.setCozinha(cozinha);
-
-        return restaurante;
+        
+        return modelMapper.map(restauranteInputDto, Restaurante.class);
     }
 }
