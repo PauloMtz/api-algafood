@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.BeanUtils;
+//import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -84,20 +84,8 @@ public class RestauranteController {
     public RestauranteDto buscarPorId(@PathVariable("restauranteId") Long id) {
         Restaurante restaurante = service.buscar(id);
 
-        /*CozinhaDto cozinhaDto = new CozinhaDto();
-        cozinhaDto.setId(restaurante.getCozinha().getId());
-        cozinhaDto.setNome(restaurante.getCozinha().getNome());
-
-        RestauranteDto restauranteDto = new RestauranteDto();
-        restauranteDto.setId(restaurante.getId());
-        restauranteDto.setNome(restaurante.getNome());
-        restauranteDto.setTaxaFrete(restaurante.getTaxaFrete());
-        restauranteDto.setCozinha(cozinhaDto);
-        return restauranteDto;*/
-
         RestauranteDto restauranteDto = assembler.convertToDto(restaurante);
         
-        // return convertToDto(restaurante);
         return restauranteDto;
     }
 
@@ -112,12 +100,14 @@ public class RestauranteController {
         @RequestBody @Valid RestauranteInputDto restauranteInputDto) {
 
         try {
-            Restaurante restaurante = disassembler.convertToDomainObject(restauranteInputDto);
+            //Restaurante restaurante = disassembler.convertToDomainObject(restauranteInputDto);
 
             Restaurante persistido = service.buscar(restauranteId);
+
+            disassembler.copyToDomainObject(restauranteInputDto, persistido);
 				
-            BeanUtils.copyProperties(restaurante, persistido,
-                "id", "formasPagamento", "endereco", "dataCadastro");
+            /*BeanUtils.copyProperties(restaurante, persistido,
+                "id", "formasPagamento", "endereco", "dataCadastro");*/
 
             return assembler.convertToDto(service.salvar(persistido));
         } catch (EntidadeNaoEncontradaException e) {
