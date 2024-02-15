@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algafood.api.assembler.CozinhaDtoAssembler;
+import com.algafood.api.assembler.CozinhaInputDtoDisassembler;
+import com.algafood.api.model.dto.CozinhaDto;
+import com.algafood.api.model.inputDto.CozinhaInputDto;
 import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.repository.CozinhaRepository;
 import com.algafood.domain.service.CozinhaService;
@@ -32,36 +35,50 @@ public class CozinhaController {
 	@Autowired
 	private CozinhaService service;
 
+	@Autowired
+	private CozinhaDtoAssembler assembler;
+
+	@Autowired
+	private CozinhaInputDtoDisassembler disassembler;
+
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Cozinha adicionar(@RequestBody @Valid Cozinha cozinha) {
-		return service.salvar(cozinha);
+	public CozinhaDto adicionar(@RequestBody 
+		@Valid CozinhaInputDto cozinhaInputDto) {
+
+		Cozinha cozinha = disassembler.convertToDomainObject(cozinhaInputDto);
+		cozinha = service.salvar(cozinha);
+
+		return assembler.convertToDto(cozinha);
 	}
 
 	@GetMapping("/{cozinhaId}")
-	public Cozinha buscarPorId(@PathVariable("cozinhaId") Long id) {
-		return service.buscar(id);
+	public CozinhaDto buscarPorId(@PathVariable("cozinhaId") Long id) {
+		return assembler.convertToDto(service.buscar(id));
 	}
 
-	@GetMapping("/nome")
-	public List<Cozinha> cozinhasPorNome(@RequestParam("c") String nome) {
-		return repository.findByNomeContaining(nome); // url: http://localhost:8080/cozinhas/nome?c=ind
+	@GetMapping("/nome") // url: http://localhost:8080/cozinhas/nome?c=ind
+	public List<CozinhaDto> cozinhasPorNome(@RequestParam("c") String nome) {
+		return assembler
+			.convertToCollectionDto(repository.findByNomeContaining(nome));
 	}
 	
 	@GetMapping
-	public List<Cozinha> listar() {
-		return repository.findAll();
+	public List<CozinhaDto> listar() {
+		return assembler.convertToCollectionDto(repository.findAll());
 	}
 
 	@PutMapping("/{cozinhaId}")
-	public Cozinha atualizar(@PathVariable Long cozinhaId, 
-		@RequestBody @Valid Cozinha cozinha) {
+	public CozinhaDto atualizar(@PathVariable Long cozinhaId, 
+		@RequestBody @Valid CozinhaInputDto cozinhaInputDto) {
 
 		Cozinha persistida = service.buscar(cozinhaId);
 			
-		BeanUtils.copyProperties(cozinha, persistida, "id");
+		disassembler.copyToDomainObject(cozinhaInputDto, persistida);
 
-		return service.salvar(persistida);
+		persistida = service.salvar(persistida);
+
+		return assembler.convertToDto(persistida);
 	}
 
 	@ResponseStatus(HttpStatus.NO_CONTENT)

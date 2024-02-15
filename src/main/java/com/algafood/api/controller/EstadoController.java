@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algafood.api.assembler.EstadoDtoAssembler;
+import com.algafood.api.assembler.EstadoInputDtoDisassembler;
+import com.algafood.api.model.dto.EstadoDto;
+import com.algafood.api.model.inputDto.EstadoInputDto;
 import com.algafood.domain.model.Estado;
 import com.algafood.domain.repository.EstadoRepository;
 import com.algafood.domain.service.EstadoService;
@@ -30,32 +33,50 @@ public class EstadoController {
 
 	@Autowired
 	private EstadoService service;
+
+	@Autowired
+	private EstadoDtoAssembler assembler;
+
+	@Autowired
+	private EstadoInputDtoDisassembler disassembler;
 	
 	@GetMapping
-	public List<Estado> listar() {
-		return repository.findAll();
+	public List<EstadoDto> listar() {
+
+		List<Estado> listaTodos = repository.findAll();
+
+		return assembler.convertToCollectionDto(listaTodos);
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)
 	@PostMapping
-    public Estado adicionar(@RequestBody @Valid Estado estado) {
-		return service.salvar(estado);
+    public EstadoDto adicionar(@RequestBody @Valid EstadoInputDto estadoInputDto) {
+
+		Estado estado = disassembler.convertToDomainObject(estadoInputDto);
+		estado = service.salvar(estado);
+
+		return assembler.convertToDto(estado);
     }
 
 	@GetMapping("/{estadoId}")
-	public Estado buscarPorId(@PathVariable("estadoId") Long id) {
-		return service.buscar(id);
+	public EstadoDto buscarPorId(@PathVariable("estadoId") Long id) {
+
+		Estado estado = service.buscar(id);
+
+		return assembler.convertToDto(estado);
 	}
 
 	@PutMapping("/{estadoId}")
-	public Estado atualizar(@PathVariable Long estadoId, 
-		@RequestBody @Valid Estado estado) {
+	public EstadoDto atualizar(@PathVariable Long estadoId, 
+		@RequestBody @Valid EstadoInputDto estadoInputDto) {
 
 		Estado persistido = service.buscar(estadoId);
 			
-		BeanUtils.copyProperties(estado, persistido, "id");
+		disassembler.copyToDomainObject(estadoInputDto, persistido);
 
-		return service.salvar(persistido);
+		persistido = service.salvar(persistido);
+
+		return assembler.convertToDto(persistido);
 	}
 
 	@ResponseStatus(HttpStatus.NO_CONTENT)
