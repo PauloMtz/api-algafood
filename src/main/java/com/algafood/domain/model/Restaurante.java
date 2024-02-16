@@ -68,6 +68,9 @@ public class Restaurante {
 	@UpdateTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
 	private OffsetDateTime  dataAtualizacao;
+
+	// já inicializa o atributo com true
+	private Boolean ativo = Boolean.TRUE;
 	
 	// ignora o atributo nome da classe cozinha
 	// caso seja informado ao serializar objeto restaurante
