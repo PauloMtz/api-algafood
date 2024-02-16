@@ -70,4 +70,18 @@ public class RestauranteService {
 		return restauranteRepository.findById(restauranteId)
 			.orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
 	}
+
+    @Transactional
+    public void ativar(Long restauranteId) {
+        Restaurante restaurante = buscar(restauranteId);
+        //restaurantePersistido.setAtivo(true);
+        restaurante.ativar();
+    }
+
+    @Transactional
+    public void desativar(Long restauranteId) {
+        Restaurante restaurante = buscar(restauranteId);
+        //restaurantePersistido.setAtivo(false);
+        restaurante.desativar();
+    }
 }
