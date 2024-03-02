@@ -33,8 +33,8 @@ public class Usuario {
 
     @Column(nullable = false)
 	private String email;
-
-    @Column(nullable = false)
+	
+	@Column(nullable = false)
 	private String senha;
 
     //@JsonIgnore
@@ -48,4 +48,12 @@ public class Usuario {
 		joinColumns = @JoinColumn(name = "usuario_id"),
 		inverseJoinColumns = @JoinColumn(name = "grupo_id"))
     private List<Grupo> grupos = new ArrayList<>();
+
+	public boolean senhaCoincide(String senha) {
+		return getSenha().equals(senha);
+	}
+	
+	public boolean senhaNaoCoincide(String senha) {
+		return !senhaCoincide(senha);
+	}
 }
