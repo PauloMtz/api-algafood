@@ -106,4 +106,8 @@ public class Restaurante {
 	public void desativar() {
 		setAtivo(false);
 	}
+
+	public boolean removerFormaPagamento(FormaPagamento formaPagamento) {
+		return getFormasPagamento().remove(formaPagamento);
+	}
 }

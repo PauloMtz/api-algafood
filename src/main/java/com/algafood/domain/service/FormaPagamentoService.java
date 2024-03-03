@@ -11,7 +11,7 @@ import com.algafood.domain.model.FormaPagamento;
 import com.algafood.domain.repository.FormaPagamentoRepository;
 
 @Service
-public class CadastroFormaPagamentoService {
+public class FormaPagamentoService {
 
     private static final String MSG_REGISTRO_UTILIZADO = 
         "O registro de ID %d está associado a outra entidade e não pode ser removido.";

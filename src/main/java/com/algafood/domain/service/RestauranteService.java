@@ -10,6 +10,7 @@ import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.exception.RestauranteNaoEncontradoException;
 import com.algafood.domain.model.Cidade;
 import com.algafood.domain.model.Cozinha;
+import com.algafood.domain.model.FormaPagamento;
 import com.algafood.domain.model.Restaurante;
 import com.algafood.domain.repository.RestauranteRepository;
 
@@ -27,6 +28,9 @@ public class RestauranteService {
 
     @Autowired
     private CidadeService cidadeService;
+
+    @Autowired
+    private FormaPagamentoService formaPagamentoService;
 
     /*
      * a anotação transactional serve para manter a consistência das
@@ -90,5 +94,16 @@ public class RestauranteService {
         Restaurante restaurante = buscar(restauranteId);
         //restaurantePersistido.setAtivo(false);
         restaurante.desativar();
+    }
+
+    @Transactional
+    public void removerFormaPagamento(Long restauranteId, 
+        Long formaPagamentoID) {
+        
+        Restaurante restaurante = buscar(restauranteId);
+        FormaPagamento formaPagamento = formaPagamentoService.buscar(formaPagamentoID);
+        
+        // não precisa do save (já está em estado gerenciado pela JPA)
+        restaurante.removerFormaPagamento(formaPagamento);
     }
 }

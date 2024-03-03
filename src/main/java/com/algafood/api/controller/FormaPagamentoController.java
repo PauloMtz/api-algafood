@@ -22,7 +22,7 @@ import com.algafood.api.model.dto.FormaPagamentoDto;
 import com.algafood.api.model.inputDto.FormaPagamentoInputDto;
 import com.algafood.domain.model.FormaPagamento;
 import com.algafood.domain.repository.FormaPagamentoRepository;
-import com.algafood.domain.service.CadastroFormaPagamentoService;
+import com.algafood.domain.service.FormaPagamentoService;
 
 @RestController
 @RequestMapping("/formas-pagamento")
@@ -32,7 +32,7 @@ public class FormaPagamentoController {
     private FormaPagamentoRepository repository;
     
     @Autowired
-    private CadastroFormaPagamentoService service;
+    private FormaPagamentoService service;
     
     @Autowired
     private FormaPagamentoDtoAssembler assembler;
