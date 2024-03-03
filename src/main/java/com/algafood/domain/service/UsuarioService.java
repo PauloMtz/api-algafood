@@ -1,5 +1,7 @@
 package com.algafood.domain.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,15 @@ public class UsuarioService {
     UsuarioRepository repository;
 
     public Usuario salvar(Usuario usuario) {
+
+        Optional<Usuario> usuarioExistente = repository.findByEmail(usuario.getEmail());
+
+        // verifica se existe o e-mail no banco e seja diferente do atual no caso de atualização
+        if (usuarioExistente.isPresent() && !usuarioExistente.get().equals(usuario)) {
+            throw new NegocioException(String.format(
+                "O e-mail %s já está cadastrado no sistema", usuario.getEmail()));
+        }
+
         return repository.save(usuario);
     }
     
