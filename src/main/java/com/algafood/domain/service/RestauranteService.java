@@ -106,4 +106,15 @@ public class RestauranteService {
         // não precisa do save (já está em estado gerenciado pela JPA)
         restaurante.removerFormaPagamento(formaPagamento);
     }
+
+    @Transactional
+    public void adicionarFormaPagamento(Long restauranteId, 
+        Long formaPagamentoID) {
+        
+        Restaurante restaurante = buscar(restauranteId);
+        FormaPagamento formaPagamento = formaPagamentoService.buscar(formaPagamentoID);
+        
+        // não precisa do save (já está em estado gerenciado pela JPA)
+        restaurante.adicionarFormaPagamento(formaPagamento);
+    }
 }
