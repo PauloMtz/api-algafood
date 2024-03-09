@@ -73,6 +73,8 @@ public class Restaurante {
 
 	// já inicializa o atributo com true
 	private Boolean ativo = Boolean.TRUE;
+
+	private Boolean aberto = Boolean.FALSE;
 	
 	// ignora o atributo nome da classe cozinha
 	// caso seja informado ao serializar objeto restaurante
@@ -108,6 +110,14 @@ public class Restaurante {
 
 	public void desativar() {
 		setAtivo(false);
+	}
+
+	public void abrir() {
+		setAberto(true);
+	}
+	
+	public void fechar() {
+		setAberto(false);
 	}
 
 	public boolean removerFormaPagamento(FormaPagamento formaPagamento) {

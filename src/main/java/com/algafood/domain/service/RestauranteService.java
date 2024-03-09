@@ -117,4 +117,18 @@ public class RestauranteService {
         // não precisa do save (já está em estado gerenciado pela JPA)
         restaurante.adicionarFormaPagamento(formaPagamento);
     }
+
+    @Transactional
+    public void abrir(Long restauranteId) {
+        Restaurante persistido = buscar(restauranteId);
+        
+        persistido.abrir();
+    }
+
+    @Transactional
+    public void fechar(Long restauranteId) {
+        Restaurante persistido = buscar(restauranteId);
+        
+        persistido.fechar();
+    }
 }
