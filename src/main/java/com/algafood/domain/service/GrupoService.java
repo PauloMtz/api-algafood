@@ -10,6 +10,7 @@ import com.algafood.domain.exception.EntidadeNaoRemoverException;
 import com.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.algafood.domain.exception.GrupoNaoEncontradoException;
 import com.algafood.domain.model.Grupo;
+import com.algafood.domain.model.Permissao;
 import com.algafood.domain.repository.GrupoRepository;
 
 @Service
@@ -20,6 +21,9 @@ public class GrupoService {
     
     @Autowired
     private GrupoRepository repository;
+
+    @Autowired
+    private PermissaoService permissaoService;
 
     /*
      * a anotação transactional serve para manter a consistência das
@@ -61,4 +65,20 @@ public class GrupoService {
 		return repository.findById(grupoId)
 			.orElseThrow(() -> new GrupoNaoEncontradoException(grupoId));
 	}
+
+    @Transactional
+    public void desassociarPermissao(Long grupoId, Long permissaoId) {
+        Grupo grupo = buscar(grupoId);
+        Permissao permissao = permissaoService.buscar(permissaoId);
+        
+        grupo.removerPermissao(permissao);
+    }
+
+    @Transactional
+    public void associarPermissao(Long grupoId, Long permissaoId) {
+        Grupo grupo = buscar(grupoId);
+        Permissao permissao = permissaoService.buscar(permissaoId);
+        
+        grupo.adicionarPermissao(permissao);
+    }
 }
