@@ -12,6 +12,7 @@ import com.algafood.domain.model.Cidade;
 import com.algafood.domain.model.Cozinha;
 import com.algafood.domain.model.FormaPagamento;
 import com.algafood.domain.model.Restaurante;
+import com.algafood.domain.model.Usuario;
 import com.algafood.domain.repository.RestauranteRepository;
 
 @Service
@@ -31,6 +32,9 @@ public class RestauranteService {
 
     @Autowired
     private FormaPagamentoService formaPagamentoService;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     /*
      * a anotação transactional serve para manter a consistência das
@@ -130,5 +134,21 @@ public class RestauranteService {
         Restaurante persistido = buscar(restauranteId);
         
         persistido.fechar();
+    }
+
+    @Transactional
+    public void desassociarResponsavel(Long restauranteId, Long usuarioId) {
+        Restaurante restaurante = buscar(restauranteId);
+        Usuario usuario = usuarioService.buscar(usuarioId);
+        
+        restaurante.removerResponsavel(usuario);
+    }
+
+    @Transactional
+    public void associarResponsavel(Long restauranteId, Long usuarioId) {
+        Restaurante restaurante = buscar(restauranteId);
+        Usuario usuario = usuarioService.buscar(usuarioId);
+        
+        restaurante.adicionarResponsavel(usuario);
     }
 }
