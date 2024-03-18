@@ -1,5 +1,7 @@
 package com.algafood.domain.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -68,6 +70,7 @@ public class RestauranteService {
      * forçar a JPA a executar as alterações no banco de dados,
      * utilizando o método flush() 
      */
+    @SuppressWarnings("null")
     @Transactional
     public void excluir(Long restauranteId) {
         try {
@@ -81,6 +84,7 @@ public class RestauranteService {
         }
 	}
 
+    @SuppressWarnings("null")
     public Restaurante buscar(Long restauranteId) {
 		return restauranteRepository.findById(restauranteId)
 			.orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
@@ -93,10 +97,23 @@ public class RestauranteService {
         restaurante.ativar();
     }
 
+    // foi anotado com transactional porque é um laço em vários elementos
+    @Transactional
+    public void ativar(List<Long> restaurantesIds) {
+        // chama o método ativar para cada elemento da lista
+        restaurantesIds.forEach(this::ativar);
+    }
+
+    @Transactional
+    public void desativar(List<Long> restaurantesIds) {
+        
+        restaurantesIds.forEach(this::desativar);
+    }
+
     @Transactional
     public void desativar(Long restauranteId) {
         Restaurante restaurante = buscar(restauranteId);
-        //restaurantePersistido.setAtivo(false);
+        //restaurante.setAtivo(false);
         restaurante.desativar();
     }
 
