@@ -10,6 +10,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,13 +34,10 @@ public class Pedido {
 	private Long id;
 
     @Column(nullable = false)
-	private BigDecimal subTotal;
+	private BigDecimal subtotal;
 
     @Column(nullable = false)
 	private BigDecimal taxaFrete;
-
-    @Column(nullable = false)
-	private BigDecimal subtotal;
 
 	@Column(nullable = false)
 	private BigDecimal valorTotal;
@@ -66,7 +64,7 @@ public class Pedido {
 	@Enumerated(EnumType.STRING)
     private StatusPedido status = StatusPedido.CRIADO;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false)
 	private FormaPagamento formaPagamento;
 	
