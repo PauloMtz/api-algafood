@@ -13,23 +13,23 @@ public class StatusPedidoService {
     private PedidoService pedidoService;
     
     @Transactional
-    public void confirmar(Long pedidoId) {
+    public void confirmar(String codigoPedido) {
         
-        Pedido pedido = pedidoService.buscar(pedidoId);
+        Pedido pedido = pedidoService.buscar(codigoPedido);
         pedido.confirmarPedido();
     }
 
     @Transactional
-    public void entregar(Long pedidoId) {
+    public void entregar(String codigoPedido) {
 
-        Pedido pedido = pedidoService.buscar(pedidoId);
+        Pedido pedido = pedidoService.buscar(codigoPedido);
         pedido.entregarPedido();
     }
 
     @Transactional
-    public void cancelar(Long pedidoId) {
+    public void cancelar(String codigoPedido) {
         
-        Pedido pedido = pedidoService.buscar(pedidoId);
+        Pedido pedido = pedidoService.buscar(codigoPedido);
         pedido.cancelarPedido();
     }
 }

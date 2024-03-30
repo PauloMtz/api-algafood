@@ -71,9 +71,9 @@ public class PedidoController {
         return pedidoResumoAssembler.convertToCollectionDto(listaPedidos);
     }
     
-    @GetMapping("/{pedidoId}")
-    public PedidoDto buscar(@PathVariable Long pedidoId) {
-        Pedido pedido = pedidoService.buscar(pedidoId);
+    @GetMapping("/{codigoPedido}")
+    public PedidoDto buscar(@PathVariable String codigoPedido) {
+        Pedido pedido = pedidoService.buscar(codigoPedido);
         
         return assembler.convertToDto(pedido);
     }
