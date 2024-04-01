@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,12 +45,31 @@ public class ProdutoController {
     @Autowired
     private ProdutoInputDtoDisassembler disassembler;
     
-    @GetMapping
+    /*@GetMapping
     public List<ProdutoDto> listar(@PathVariable Long restauranteId) {
 
         Restaurante restaurante = restauranteService.buscar(restauranteId);
         
         List<Produto> listaTodos = repository.findByRestaurante(restaurante);
+        
+        return assembler.convertToCollectionDto(listaTodos);
+    }*/
+
+    @GetMapping
+    public List<ProdutoDto> listar(@PathVariable Long restauranteId,
+        @RequestParam(required = false) boolean incluirInativos) {
+
+        Restaurante restaurante = restauranteService.buscar(restauranteId);
+
+        List<Produto> listaTodos = null;
+
+        if (incluirInativos) {
+            // http://localhost:8080/restaurantes/1/produtos?incluirInativos=true
+            listaTodos = repository.findProdutosByRestaurante(restaurante);
+        } else {
+            // http://localhost:8080/restaurantes/1/produtos
+            listaTodos = repository.findProdutosAtivosByRestaurante(restaurante);
+        }
         
         return assembler.convertToCollectionDto(listaTodos);
     }
