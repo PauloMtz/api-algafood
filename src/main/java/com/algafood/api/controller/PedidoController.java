@@ -28,6 +28,8 @@ import com.algafood.domain.exception.NegocioException;
 import com.algafood.domain.model.Pedido;
 import com.algafood.domain.model.Usuario;
 import com.algafood.domain.repository.PedidoRepository;
+import com.algafood.domain.repository.filter.PedidoFilter;
+import com.algafood.domain.repository.specification.PedidoSpecification;
 import com.algafood.domain.service.PedidoService;
 //import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 //import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -94,9 +96,19 @@ public class PedidoController {
     }
     */
     
-    @GetMapping
+    /*@GetMapping
     public List<PedidoResumoDto> listar() {
         List<Pedido> listaPedidos = pedidoRepository.findAll();
+        
+        return pedidoResumoAssembler.convertToCollectionDto(listaPedidos);
+    }*/
+
+    // http://localhost:8080/pedidos?clienteId=1&restauranteId=1
+    // http://localhost:8080/pedidos?restauranteId=1&dataInicio=2024-04-03T19:56:00Z
+    // http://localhost:8080/pedidos?restauranteId=1&dataInicio=2019-10-30T12:00:00Z&dataFim=2019-10-31T12:00:00Z
+    @GetMapping
+    public List<PedidoResumoDto> pesquisar(PedidoFilter filtro) {
+        List<Pedido> listaPedidos = pedidoRepository.findAll(PedidoSpecification.usandoFiltro(filtro));
         
         return pedidoResumoAssembler.convertToCollectionDto(listaPedidos);
     }
