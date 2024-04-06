@@ -50,6 +50,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		// é um método de BindException()
 		ex.getBindingResult();
 		
+		// essa chamada abaixo dará erros, e lançará exceção
+		// http://localhost:8080/pedidos?restauranteId=1&clienteId=aa&dataInicio=2019-10-30T12:00:00(Z)&dataFim=2019-10-31T12:00:00(Z)
 		return handleValidationInternal(ex, ex.getBindingResult(), headers, status, request);
 	}
 
