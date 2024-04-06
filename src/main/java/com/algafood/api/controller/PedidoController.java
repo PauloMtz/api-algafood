@@ -6,6 +6,10 @@ import javax.validation.Valid;
 
 //import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 //import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -106,11 +110,26 @@ public class PedidoController {
     // http://localhost:8080/pedidos?clienteId=1&restauranteId=1
     // http://localhost:8080/pedidos?restauranteId=1&dataInicio=2024-04-03T19:56:00Z
     // http://localhost:8080/pedidos?restauranteId=1&dataInicio=2019-10-30T12:00:00Z&dataFim=2019-10-31T12:00:00Z
-    @GetMapping
+    /*@GetMapping
     public List<PedidoResumoDto> pesquisar(PedidoFilter filtro) {
         List<Pedido> listaPedidos = pedidoRepository.findAll(PedidoSpecification.usandoFiltro(filtro));
         
         return pedidoResumoAssembler.convertToCollectionDto(listaPedidos);
+    }*/
+
+    // http://localhost:8080/pedidos?clienteId=1&restauranteId=1&page=0
+    @GetMapping
+    public Page<PedidoResumoDto> pesquisar(PedidoFilter filtro,
+        @PageableDefault(size = 2) Pageable pageable) {
+        
+        Page<Pedido> listaPedidos = pedidoRepository.findAll(PedidoSpecification.usandoFiltro(filtro), pageable);
+        
+        List<PedidoResumoDto> pedidosResumoDto = pedidoResumoAssembler.convertToCollectionDto(listaPedidos.getContent());
+        
+        Page<PedidoResumoDto> pedidosResumoDtoPage = new PageImpl<>(
+            pedidosResumoDto, pageable, listaPedidos.getTotalElements());
+
+        return pedidosResumoDtoPage;
     }
     
     @GetMapping("/{codigoPedido}")

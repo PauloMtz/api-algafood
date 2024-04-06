@@ -19,8 +19,10 @@ public class PedidoSpecification {
             // ou seja, para cada item associado, a JPA executa um select
             // equivale a (from Pedido p join fetch p.restaurante r 
             //  join fetch r.cozinha join fetch p.cliente)
-            root.fetch("restaurante").fetch("cozinha");
-            root.fetch("cliente");
+            if (Pedido.class.equals(query.getResultType())) {
+                root.fetch("restaurante").fetch("cozinha");
+                root.fetch("cliente");
+            }
 
             var predicates = new ArrayList<Predicate>();
 
