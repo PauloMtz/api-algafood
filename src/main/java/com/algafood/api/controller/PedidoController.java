@@ -27,6 +27,7 @@ import com.algafood.api.assembler.PedidoResumoDtoAssembler;
 import com.algafood.api.model.dto.PedidoDto;
 import com.algafood.api.model.dto.PedidoResumoDto;
 import com.algafood.api.model.inputDto.PedidoInputDto;
+import com.algafood.core.data.PageableTranslator;
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.NegocioException;
 import com.algafood.domain.model.Pedido;
@@ -37,6 +38,7 @@ import com.algafood.domain.repository.specification.PedidoSpecification;
 import com.algafood.domain.service.PedidoService;
 //import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 //import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.google.common.collect.ImmutableMap;
 
 @RestController
 @RequestMapping(value = "/pedidos")
@@ -122,6 +124,8 @@ public class PedidoController {
     public Page<PedidoResumoDto> pesquisar(PedidoFilter filtro,
         @PageableDefault(size = 2) Pageable pageable) {
         
+        pageable = converterPageable(pageable);
+        
         Page<Pedido> listaPedidos = pedidoRepository.findAll(PedidoSpecification.usandoFiltro(filtro), pageable);
         
         List<PedidoResumoDto> pedidosResumoDto = pedidoResumoAssembler.convertToCollectionDto(listaPedidos.getContent());
@@ -132,6 +136,20 @@ public class PedidoController {
         return pedidosResumoDtoPage;
     }
     
+    // http://localhost:8080/pedidos?page=0&sort=nomeCliente,desc
+    private Pageable converterPageable(Pageable apiPageable) {
+        
+        var mapeamento = ImmutableMap.of(
+            "codigo", "codigo",
+            "restaurante.nome", "restaurante.nome",
+            "nomeCliente", "cliente.nome",
+            "valorTotal", "valorTotal"
+        );
+
+        // com.algafood.core.data.PageableTranslator
+        return PageableTranslator.translate(apiPageable, mapeamento);
+    }
+
     @GetMapping("/{codigoPedido}")
     public PedidoDto buscar(@PathVariable String codigoPedido) {
         Pedido pedido = pedidoService.buscar(codigoPedido);
