@@ -1,5 +1,6 @@
 package com.algafood.domain.infrastructure.service;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,8 @@ public class VendaQueryServiceImpl implements VendaQueryService {
 
     // http://localhost:8080/estatisticas/vendas-diarias?restauranteId=1
     @Override
-    public List<VendaDiariaDto> consultarVendasDiarias(VendaDiariaFilter filter) {
+    public List<VendaDiariaDto> consultarVendasDiarias(
+        VendaDiariaFilter filter, String timeOffset) {
         
         var builder = manager.getCriteriaBuilder();
         var query = builder.createQuery(VendaDiariaDto.class);
@@ -33,8 +35,12 @@ public class VendaQueryServiceImpl implements VendaQueryService {
         var predicates = new ArrayList<Predicate>();
 
         // essa dataCriacao é um atributo de com.algafood.domain.model.Pedido
+        var functionConvertTzDataCriacao = builder.function(
+            "convert_tz", Date.class, root.get("dataCriacao"),
+            builder.literal("+00:00"), builder.literal(timeOffset));
+
         var functionDateDataCriacao = builder.function(
-            "date", LocalDate.class, root.get("dataCriacao"));
+            "date", LocalDate.class, functionConvertTzDataCriacao);
 
         var selection = builder.construct(VendaDiariaDto.class, 
             functionDateDataCriacao,
