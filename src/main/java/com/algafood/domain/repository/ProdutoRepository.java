@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.algafood.domain.model.FotoProduto;
 import com.algafood.domain.model.Produto;
 import com.algafood.domain.model.Restaurante;
 
@@ -20,4 +21,9 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long>, Produto
 
     @Query("from Produto p where p.ativo = true and p.restaurante = :restaurante")
     List<Produto> findProdutosAtivosByRestaurante(Restaurante restaurante);
+
+    @Query("select fp from FotoProduto fp join fp.produto p "
+        + "where p.restaurante.id = :restauranteId "
+        + "and fp.produtoId = :produtoId")
+    Optional<FotoProduto> findFotoById(Long restauranteId, Long produtoId);
 }
