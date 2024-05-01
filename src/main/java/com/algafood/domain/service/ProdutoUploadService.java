@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.algafood.domain.model.FotoProduto;
+import com.algafood.domain.repository.ProdutoFotoRepository;
 import com.algafood.domain.repository.ProdutoRepository;
 
 @Service
@@ -14,6 +15,9 @@ public class ProdutoUploadService {
 
     @Autowired
     private ProdutoRepository produtoRepository;
+
+    @Autowired
+    private ProdutoFotoRepository fotoRepository;
     
     @Transactional
     public FotoProduto salvar(FotoProduto fotoProduto) {
@@ -26,10 +30,10 @@ public class ProdutoUploadService {
 
         if (fotoExistente.isPresent()) {
             // se já tiver uma foto, exclui
-            produtoRepository.delete(fotoProduto);
+            fotoRepository.delete(fotoExistente.get());
         }
 
         // se já tiver uma foto, exclui para salvar outra em cima
-        return produtoRepository.save(fotoProduto);
+        return fotoRepository.save(fotoProduto);
     }
 }

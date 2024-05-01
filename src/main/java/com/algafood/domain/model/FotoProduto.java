@@ -6,9 +6,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.MapsId;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
-
-import com.algafood.core.validation.Groups;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +15,6 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class FotoProduto {
     
-	@NotNull(groups = Groups.EstadoId.class)
     @EqualsAndHashCode.Include
 	@Id
 	@Column(name = "produto_id")
