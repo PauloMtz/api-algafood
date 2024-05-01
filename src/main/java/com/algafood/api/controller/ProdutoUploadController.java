@@ -1,5 +1,7 @@
 package com.algafood.api.controller;
 
+import java.io.IOException;
+
 //import java.nio.file.Path;
 //import java.util.UUID;
 
@@ -59,7 +61,7 @@ public class ProdutoUploadController {
     // http://localhost:8080/restaurantes/6/produtos/10/imagem
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProdutoFotoDto atualizaImagem(@PathVariable Long restauranteId,
-        @PathVariable Long produtoId, @Valid ProdutoUploadInputDto produtoUploadInputDto) {
+        @PathVariable Long produtoId, @Valid ProdutoUploadInputDto produtoUploadInputDto) throws IOException {
 
         Produto produto = produtoService.buscar(restauranteId, produtoId);
         MultipartFile arquivoFoto = produtoUploadInputDto.getImagem();
@@ -71,7 +73,7 @@ public class ProdutoUploadController {
         fotoProduto.setTamanho(arquivoFoto.getSize());
         fotoProduto.setNomeArquivo(arquivoFoto.getOriginalFilename());
 
-        FotoProduto foto = produtoUploadService.salvar(fotoProduto);
+        FotoProduto foto = produtoUploadService.salvar(fotoProduto, arquivoFoto.getInputStream());
 
         return assembler.convertToDto(foto);
     }
