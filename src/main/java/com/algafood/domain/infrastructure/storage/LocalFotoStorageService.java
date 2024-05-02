@@ -39,6 +39,28 @@ public class LocalFotoStorageService implements FotoStorageService {
         }
     }
 
+    @Override
+    public void remover(String nomeArquivo) {
+
+        try {
+            Path arquiPath =getArquivoPath(nomeArquivo);
+            Files.deleteIfExists(arquiPath);
+        } catch (IOException e) {
+            throw new StorageException("Erro ao remover arquivo", e);
+        }
+    }
+
+    @Override
+    public void substituirArquivo(String fotoExistenteArmazenamento, NovaFoto novaFoto) {
+
+        this.armazenar(novaFoto);
+
+        // antes de armazenar em disco, remover a anterior
+        if (fotoExistenteArmazenamento != null) {
+            this.remover(fotoExistenteArmazenamento);
+        }
+    }
+
     private Path getArquivoPath(String nomeArquivo) {
         return diretorioFotos.resolve(Path.of(nomeArquivo));
     }

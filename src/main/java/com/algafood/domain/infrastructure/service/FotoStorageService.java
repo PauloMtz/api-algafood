@@ -8,7 +8,9 @@ import lombok.Getter;
 public interface FotoStorageService {
     
     void armazenar(NovaFoto novaFoto);
+    void remover(String nomeArquivo);
     String gerarNomeArquivo(String nomeArquivo);
+    void substituirArquivo(String fotoExistenteArmazenamento, NovaFoto novaFoto);
 
     @Builder
     @Getter

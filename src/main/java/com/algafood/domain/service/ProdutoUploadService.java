@@ -31,12 +31,16 @@ public class ProdutoUploadService {
         Long restauranteId = fotoProduto.getRestauranteId();
         Long produtoId = fotoProduto.getProduto().getId();
         String novoNomeArquivo = storageService.gerarNomeArquivo(fotoProduto.getNomeArquivo());
+        String fotoExistenteArmazenamento = null;
 
         Optional<FotoProduto> fotoExistente = produtoRepository
             .findFotoById(restauranteId, produtoId);
 
         if (fotoExistente.isPresent()) {
-            // se já tiver uma foto, exclui
+            // verifica se tem foto armazenada em algum local
+            fotoExistenteArmazenamento = fotoExistente.get().getNomeArquivo();
+
+            // se já tiver uma foto no banco, exclui
             fotoRepository.delete(fotoExistente.get());
         }
 
@@ -52,9 +56,12 @@ public class ProdutoUploadService {
             .fluxoArquivo(dadosArquivo)
             .build();
 
-        storageService.armazenar(novaFoto);
+        // esse substituir grava a nova e já remover a anterior se tiver
+        storageService.substituirArquivo(fotoExistenteArmazenamento, novaFoto);
 
-        // se já tiver uma foto, exclui para salvar outra em cima
+        // grava a nova foto
+        //storageService.armazenar(novaFoto);
+
         return fotoProduto;
     }
 }
