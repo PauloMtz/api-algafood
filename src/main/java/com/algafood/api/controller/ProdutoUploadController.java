@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,5 +77,14 @@ public class ProdutoUploadController {
         FotoProduto foto = produtoUploadService.salvar(fotoProduto, arquivoFoto.getInputStream());
 
         return assembler.convertToDto(foto);
+    }
+
+    @GetMapping
+    public ProdutoFotoDto buscar(@PathVariable Long restauranteId, 
+        @PathVariable Long produtoId) {
+
+        FotoProduto fotoProduto = produtoUploadService.buscar(restauranteId, produtoId);
+        
+        return assembler.convertToDto(fotoProduto);
     }
 }

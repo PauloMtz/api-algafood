@@ -1,6 +1,7 @@
 package com.algafood.domain.infrastructure.storage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -19,8 +20,10 @@ public class LocalFotoStorageService implements FotoStorageService {
     private Path diretorioFotos;
 
     public String gerarNomeArquivo(String nomeArquivo) {
+        
         int lastIndex = nomeArquivo.lastIndexOf(".");
         String ext = nomeArquivo.substring(lastIndex);
+
         return UUID.randomUUID().toString().replace("-", "")
             + LocalDateTime.now().toString().replaceAll("[\\:\\-\\.]", "") 
             + ext;
@@ -47,6 +50,17 @@ public class LocalFotoStorageService implements FotoStorageService {
             Files.deleteIfExists(arquiPath);
         } catch (IOException e) {
             throw new StorageException("Erro ao remover arquivo", e);
+        }
+    }
+
+    @Override
+    public InputStream recuperar(String nomeArquivo) {
+
+        try {
+            Path arquivoPath = getArquivoPath(nomeArquivo);
+            return Files.newInputStream(arquivoPath);
+        } catch (Exception e) {
+            throw new StorageException("Erro ao recuperar arquivo.", e);
         }
     }
 

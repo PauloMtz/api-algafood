@@ -9,6 +9,7 @@ public interface FotoStorageService {
     
     void armazenar(NovaFoto novaFoto);
     void remover(String nomeArquivo);
+    InputStream recuperar(String nomeArquivo);
     String gerarNomeArquivo(String nomeArquivo);
     void substituirArquivo(String fotoExistenteArmazenamento, NovaFoto novaFoto);
 
