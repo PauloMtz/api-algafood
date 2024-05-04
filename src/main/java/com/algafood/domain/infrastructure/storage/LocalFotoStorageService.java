@@ -46,8 +46,8 @@ public class LocalFotoStorageService implements FotoStorageService {
     public void remover(String nomeArquivo) {
 
         try {
-            Path arquiPath =getArquivoPath(nomeArquivo);
-            Files.deleteIfExists(arquiPath);
+            Path arquivoPath = getArquivoPath(nomeArquivo);
+            Files.deleteIfExists(arquivoPath);
         } catch (IOException e) {
             throw new StorageException("Erro ao remover arquivo", e);
         }

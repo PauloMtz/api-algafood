@@ -70,4 +70,14 @@ public class ProdutoUploadService {
         return produtoRepository.findFotoById(restauranteId, produtoId)
             .orElseThrow(() -> new FotoProdutoNaoEncontradaException(restauranteId, produtoId));
     }
+
+    @Transactional
+    public void excluir(Long restauranteId, Long produtoId) {
+        FotoProduto foto = buscar(restauranteId, produtoId);
+        
+        fotoRepository.delete(foto);
+        fotoRepository.flush();
+
+        storageService.remover(foto.getNomeArquivo());
+    }
 }
