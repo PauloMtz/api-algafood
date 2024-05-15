@@ -11,13 +11,16 @@ import javax.validation.Valid;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 //import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.http.converter.json.MappingJacksonValue;
+//import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.SmartValidator;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,7 +29,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+//import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +37,7 @@ import com.algafood.api.assembler.RestauranteDtoAssembler;
 import com.algafood.api.assembler.RestauranteInputDtoDisassembler;
 import com.algafood.api.model.dto.RestauranteDto;
 import com.algafood.api.model.inputDto.RestauranteInputDto;
-import com.algafood.api.model.jsonView.IRestauranteView;
+//import com.algafood.api.model.jsonView.IRestauranteView;
 import com.algafood.core.validation.ValidacaoException;
 import com.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.domain.exception.NegocioException;
@@ -45,6 +48,9 @@ import com.algafood.domain.service.RestauranteService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+//@CrossOrigin(origins = "*")
+//@CrossOrigin
+//@CrossOrigin(maxAge = 10)
 @RestController
 @RequestMapping("/restaurantes")
 public class RestauranteController {
@@ -65,11 +71,19 @@ public class RestauranteController {
     private RestauranteInputDtoDisassembler disassembler;
 
     /*@GetMapping
-    public List<RestauranteDto> listar() {
-        return assembler.convertToCollectionDto(repository.findAll());
+    public ResponseEntity<List<RestauranteDto>> listar() {
+        List<RestauranteDto> restaurantes = assembler.convertToCollectionDto(repository.findAll());
+        return ResponseEntity.ok().header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, 
+            "http://localhost:8000").body(restaurantes);
     }*/
 
+    //@CrossOrigin(origins = {"http://localhost:8000", "outro"})
     @GetMapping
+    public List<RestauranteDto> listar() {
+        return assembler.convertToCollectionDto(repository.findAll());
+    }
+
+    /*@GetMapping
     public MappingJacksonValue listar(
         @RequestParam(required = false) String projecao) {
 
@@ -84,7 +98,7 @@ public class RestauranteController {
         }
 
         return restaurantesWrapper;
-    }
+    }*/
 
     /*  URLs:
         http://localhost:8080/restaurantes?projecao=apenas-nome
